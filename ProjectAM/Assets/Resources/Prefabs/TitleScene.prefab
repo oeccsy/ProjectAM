@@ -252,7 +252,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b6b43753fb473e4a90ee0b4213d5393, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TitleSceneUI
-  <StartButton>k__BackingField: {fileID: 0}
+  <StartButton>k__BackingField: {fileID: 8589051789076204700}
 --- !u!223 &713020159595203482
 Canvas:
   m_ObjectHideFlags: 0
