@@ -75,7 +75,9 @@ public class MapDataGenerator
         }
 
         // BFS : 영역 구분
-        List<MapNode> areaBorderNodes = new List<MapNode>();
+        List<List<MapNode>> borderNodesByArea = new List<List<MapNode>>();
+        borderNodesByArea.Add(new List<MapNode>());
+
         int[] dr = new int[4] { 0, 0, 1, -1 };
         int[] dc = new int[4] { 1, -1, 0, 0 };
 
@@ -87,6 +89,7 @@ public class MapDataGenerator
                 if (nodes[row, col].type != 'A') continue;
 
                 areaCount++;
+                borderNodesByArea.Add(new List<MapNode>());
 
                 Queue<MapNode> bfsQueue = new Queue<MapNode>();
                 MapNode start = nodes[row, col];
@@ -112,8 +115,8 @@ public class MapDataGenerator
 
                         bfsQueue.Enqueue(nodes[nextRow, nextCol]);
                     }
-
-                    if (isEdge) areaBorderNodes.Add(curNode);
+                    
+                    if (isEdge) borderNodesByArea[areaCount].Add(curNode);
                 }
             }
         }
@@ -121,24 +124,32 @@ public class MapDataGenerator
         // areaCount 확정 후 동적 배열 할당
         areaAdj = new AreaEdge[areaCount + 1, areaCount + 1];
         for (int i = 0; i <= areaCount; i++)
+        {
             for (int j = 0; j <= areaCount; j++)
+            {
                 areaAdj[i, j] = new AreaEdge { weight = MaxWeight };
+            }
+        }
 
         // BFS : 경계 노드에서 다른 영역까지 최단거리 탐색
         bool[,] isVisit = new bool[height, width];
 
-        foreach (MapNode borderNode in areaBorderNodes)
+        foreach (List<MapNode> borderNodes in borderNodesByArea)
         {
-            Array.Clear(isVisit, 0, isVisit.Length);
-            Queue<(MapNode node, int dist)> bfsQueue = new Queue<(MapNode, int)>();
+            if (borderNodes.Count == 0) continue;
 
-            MapNode start = borderNode;
-            isVisit[start.row, start.col] = true;
-            bfsQueue.Enqueue((start, 0));
+            Array.Clear(isVisit, 0, isVisit.Length);
+            Queue<(MapNode startNode, MapNode node, int dist)> bfsQueue = new Queue<(MapNode, MapNode, int)>();
+
+            foreach(MapNode startNode in borderNodes)
+            {
+                isVisit[startNode.row, startNode.col] = true;
+                bfsQueue.Enqueue((startNode, startNode, 0));
+            }
 
             while (bfsQueue.Count > 0)
             {
-                (MapNode curNode, int curNodeDist) = bfsQueue.Dequeue();
+                (MapNode startNode, MapNode curNode, int curNodeDist) = bfsQueue.Dequeue();
 
                 for (int i = 0; i < 4; i++)
                 {
@@ -147,28 +158,28 @@ public class MapDataGenerator
 
                     if (nextRow < 0 || nextCol < 0 || nextRow >= height || nextCol >= width) continue;
                     if (isVisit[nextRow, nextCol]) continue;
-                    if (nodes[nextRow, nextCol].areaID == start.areaID) continue;
+                    if (nodes[nextRow, nextCol].areaID == startNode.areaID) continue;
 
                     isVisit[nextRow, nextCol] = true;
 
                     MapNode nextNode = nodes[nextRow, nextCol];
                     int nextNodeDist = curNodeDist + 1;
 
-                    if (nextNode.areaID > 0 && nextNodeDist < areaAdj[start.areaID, nextNode.areaID].weight)
+                    if (nextNode.areaID > 0 && nextNodeDist < areaAdj[startNode.areaID, nextNode.areaID].weight)
                     {
-                        AreaEdge uv = areaAdj[start.areaID, nextNode.areaID];
-                        uv.src = start;
+                        AreaEdge uv = areaAdj[startNode.areaID, nextNode.areaID];
+                        uv.src = startNode;
                         uv.dest = nextNode;
                         uv.weight = nextNodeDist;
 
-                        AreaEdge vu = areaAdj[nextNode.areaID, start.areaID];
+                        AreaEdge vu = areaAdj[nextNode.areaID, startNode.areaID];
                         vu.src = nextNode;
-                        vu.dest = start;
+                        vu.dest = startNode;
                         vu.weight = nextNodeDist;
                     }
                     else
                     {
-                        bfsQueue.Enqueue((nextNode, nextNodeDist));
+                        bfsQueue.Enqueue((startNode, nextNode, nextNodeDist));
                     }
                 }
             }
@@ -245,9 +256,14 @@ public class MapDataGenerator
 
             if (dest == null) continue;
 
-            MapNode path = dest;
+            MapNode path = prev[dest.row, dest.col];
             while (path != src)
             {
+                if (nodes[path.row, path.col].type == 'A')
+                {
+                    Debug.Log("Error: Path should only go through empty nodes. Check BFS path tracking logic.");
+                }
+
                 nodes[path.row, path.col].type = 'R';
                 path = prev[path.row, path.col];
             }
