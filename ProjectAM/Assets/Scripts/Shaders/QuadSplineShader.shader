@@ -1,4 +1,4 @@
-Shader "Unlit/CurveShader"
+Shader "Spline/QuadSplineShader"
 {
     Properties
     {
@@ -37,7 +37,7 @@ Shader "Unlit/CurveShader"
                 float3 p2 : TEXCOORD1;
                 float3 p3 : TEXCOORD2;
                 float3 p4 : TEXCOORD3;
-                float3 worldPos : TEXCOORD4;
+                float3 localPos : TEXCOORD4;
             };
 
             v2f vert (appdata v)
@@ -48,12 +48,12 @@ Shader "Unlit/CurveShader"
                 o.p2 = v.p2;
                 o.p3 = v.p3;
                 o.p4 = v.p4;
-                o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
+                o.localPos = v.vertex.xyz;
 
                 return o;
             }
 
-            float3 cubicBezierPoint(float3 p1, float3 p2, float3 p3, float3 p4, float t)
+            float3 bezierPoint(float3 p1, float3 p2, float3 p3, float3 p4, float t)
             {
                 float3 m1 = lerp(p1, p2, t);
                 float3 m2 = lerp(p2, p3, t);
@@ -67,7 +67,7 @@ Shader "Unlit/CurveShader"
                 return m6;
             }
 
-            float sdf(float3 position, float3 start, float3 end)
+            float segmentSDF(float3 position, float3 start, float3 end)
             {
                 float3 sp = position - start;
                 float3 se = end - start;
@@ -88,8 +88,8 @@ Shader "Unlit/CurveShader"
 
                 for(float t = 0.02; t < 1.0; t += 0.02)
                 {
-                    float3 tempEnd = cubicBezierPoint(i.p1, i.p2, i.p3, i.p4, t);
-                    float tempDist = sdf(i.worldPos, tempStart, tempEnd);
+                    float3 tempEnd = bezierPoint(i.p1, i.p2, i.p3, i.p4, t);
+                    float tempDist = segmentSDF(i.localPos, tempStart, tempEnd);
 
                     minDist = min(minDist, tempDist);
                     tempStart = tempEnd;
