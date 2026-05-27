@@ -44,6 +44,10 @@ Assets/Scripts/
 Assets/Resources/Prefabs/  # Runtime-loadable scene prefabs
 ```
 
+## Code Conventions
+
+See [DOCS/CodeConventions.md](DOCS/CodeConventions.md) for coding style rules.
+
 ## Development Notes
 
 - Open the project in Unity 6000.3.7f1 — do not upgrade the editor version without consideration.

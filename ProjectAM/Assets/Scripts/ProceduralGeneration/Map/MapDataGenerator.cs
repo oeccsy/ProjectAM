@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI.Table;
 
 public class MapDataGenerator
 {
@@ -14,13 +15,21 @@ public class MapDataGenerator
     private int width;
     private int height;
     private int areaCount;
-    private int forestCount;
 
     public MapData MapData { get; private set; }
 
     public MapData GenerateMapData(PerlinNoise perlinNoise)
     {
         GenerateFieldData(perlinNoise);
+        GenerateOutlineData();
+
+        MapData = BuildMapData();
+        return MapData;
+    }
+
+    public MapData GenerateSimpleMapData(PerlinNoise perlinNoise)
+    {
+        GenerateSimpleFieldData(perlinNoise);
 
         MapData = BuildMapData();
         return MapData;
@@ -62,7 +71,7 @@ public class MapDataGenerator
         {
             for (int col = 0; col < width; col++)
             {
-                int perlin = perlinNoise.NoiseValue[row, col];
+                float perlin = perlinNoise.NoiseValue[row, col];
                 nodes[row, col] = new MapNode
                 {
                     row = row,
@@ -71,12 +80,18 @@ public class MapDataGenerator
                     areaID = Undefined,
                     type = (perlin >= 1) ? 'A' : ' '
                 };
+
+                if(row == 0 || col == 0 || row == height - 1 || col == width - 1)
+                {
+                    nodes[row, col].perlin = 0.0f;
+                    nodes[row, col].type = ' ';
+                }
             }
         }
 
         // BFS : 영역 구분
-        List<List<MapNode>> borderNodesByArea = new List<List<MapNode>>();
-        borderNodesByArea.Add(new List<MapNode>());
+        List<List<MapNode>> boundaryNodesByArea = new List<List<MapNode>>();
+        boundaryNodesByArea.Add(new List<MapNode>());
 
         int[] dr = new int[4] { 0, 0, 1, -1 };
         int[] dc = new int[4] { 1, -1, 0, 0 };
@@ -89,7 +104,7 @@ public class MapDataGenerator
                 if (nodes[row, col].type != 'A') continue;
 
                 areaCount++;
-                borderNodesByArea.Add(new List<MapNode>());
+                boundaryNodesByArea.Add(new List<MapNode>());
 
                 Queue<MapNode> bfsQueue = new Queue<MapNode>();
                 MapNode start = nodes[row, col];
@@ -116,7 +131,7 @@ public class MapDataGenerator
                         bfsQueue.Enqueue(nodes[nextRow, nextCol]);
                     }
                     
-                    if (isEdge) borderNodesByArea[areaCount].Add(curNode);
+                    if (isEdge) boundaryNodesByArea[areaCount].Add(curNode);
                 }
             }
         }
@@ -132,18 +147,18 @@ public class MapDataGenerator
         }
 
         // BFS : 경계 노드에서 다른 영역까지 최단거리 탐색
-        bool[,] isVisit = new bool[height, width];
+        bool[,] isVisited = new bool[height, width];
 
-        foreach (List<MapNode> borderNodes in borderNodesByArea)
+        foreach (List<MapNode> boundaryNodes in boundaryNodesByArea)
         {
-            if (borderNodes.Count == 0) continue;
+            if (boundaryNodes.Count == 0) continue;
 
-            Array.Clear(isVisit, 0, isVisit.Length);
+            Array.Clear(isVisited, 0, isVisited.Length);
             Queue<(MapNode startNode, MapNode node, int dist)> bfsQueue = new Queue<(MapNode, MapNode, int)>();
 
-            foreach(MapNode startNode in borderNodes)
+            foreach(MapNode startNode in boundaryNodes)
             {
-                isVisit[startNode.row, startNode.col] = true;
+                isVisited[startNode.row, startNode.col] = true;
                 bfsQueue.Enqueue((startNode, startNode, 0));
             }
 
@@ -157,10 +172,10 @@ public class MapDataGenerator
                     int nextCol = curNode.col + dc[i];
 
                     if (nextRow < 0 || nextCol < 0 || nextRow >= height || nextCol >= width) continue;
-                    if (isVisit[nextRow, nextCol]) continue;
+                    if (isVisited[nextRow, nextCol]) continue;
                     if (nodes[nextRow, nextCol].areaID == startNode.areaID) continue;
 
-                    isVisit[nextRow, nextCol] = true;
+                    isVisited[nextRow, nextCol] = true;
 
                     MapNode nextNode = nodes[nextRow, nextCol];
                     int nextNodeDist = curNodeDist + 1;
@@ -265,6 +280,7 @@ public class MapDataGenerator
                 }
 
                 nodes[path.row, path.col].type = 'R';
+                nodes[path.row, path.col].perlin = 1.0f;
                 path = prev[path.row, path.col];
             }
 
@@ -274,133 +290,70 @@ public class MapDataGenerator
             if (unionCount == areaCount - 1) break;
         }
     }
-    private void GenerateHouseData(int houseCount)
+
+    private void GenerateSimpleFieldData(PerlinNoise perlinNoise)
     {
-        List<List<MapNode>> candidatesByArea = new List<List<MapNode>>();
-        for (int i = 0; i <= areaCount; i++) candidatesByArea.Add(new List<MapNode>());
+        width = perlinNoise.NoiseSettings.resolution.x;
+        height = perlinNoise.NoiseSettings.resolution.y;
 
-        List<int> candidateAreas = new List<int>();
-
+        nodes = new MapNode[height, width];
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
-                if (nodes[row, col].perlin > 1 && nodes[row, col].areaID > 0)
-                    candidatesByArea[nodes[row, col].areaID].Add(nodes[row, col]);
-            }
-        }
-
-        for (int i = 1; i <= areaCount; i++)
-        {
-            Utils.Shuffle(candidatesByArea[i]);
-            candidateAreas.Add(i);
-        }
-
-        Utils.Shuffle(candidateAreas);
-        int areaIndex = 0;
-
-        for (int i = 0; i < houseCount; i++)
-        {
-            bool isValid;
-            do
-            {
-                isValid = true;
-
-                int targetArea = candidateAreas[areaIndex];
-                while (candidatesByArea[targetArea].Count == 0)
+                float perlin = perlinNoise.NoiseValue[row, col];
+                nodes[row, col] = new MapNode
                 {
-                    areaIndex = (areaIndex + 1) % candidateAreas.Count;
-                    targetArea = candidateAreas[areaIndex];
-                }
+                    row = row,
+                    col = col,
+                    perlin = perlin,
+                    areaID = Undefined,
+                    type = (perlin >= 1) ? 'A' : ' '
+                };
 
-                MapNode target = candidatesByArea[targetArea][^1];
-                candidatesByArea[targetArea].RemoveAt(candidatesByArea[targetArea].Count - 1);
-
-                for (int j = 0; j < 4 && isValid; j++)
+                if (row == 0 || col == 0 || row == height - 1 || col == width - 1)
                 {
-                    for (int k = 0; k < 4 && isValid; k++)
-                    {
-                        int r = target.row + j;
-                        int c = target.col + k;
-                        if (r >= height || c >= width) { isValid = false; break; }
-
-                        MapNode adj = nodes[r, c];
-                        if (adj.perlin <= 1 || adj.areaID <= 0) isValid = false;
-                        if (adj.type == 'H' || adj.type == 'h') isValid = false;
-                    }
-                }
-
-                if (isValid)
-                {
-                    for (int j = 0; j < 4; j++)
-                        for (int k = 0; k < 4; k++)
-                            nodes[target.row + j, target.col + k].type = 'h';
-
-                    nodes[target.row, target.col].type = 'H';
-                    areaIndex = (areaIndex + 1) % candidateAreas.Count;
+                    nodes[row, col].perlin = 0.0f;
+                    nodes[row, col].type = ' ';
                 }
             }
-            while (!isValid);
         }
     }
 
-    private void GenerateForestData()
+    private void GenerateOutlineData()
     {
-        int[] dr = new int[4] { 0, 0, 1, -1 };
-        int[] dc = new int[4] { 1, -1, 0, 0 };
+        int[] dr = new int[4] { 1, -1, 0, 0 };
+        int[] dc = new int[4] { 0, 0, 1, -1 };
 
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
                 if (nodes[row, col].type != ' ') continue;
-                if (!IsForestBorder(nodes[row, col])) continue;
 
-                forestCount++;
-
-                bool[,] isVisit = new bool[height, width];
-                Stack<MapNode> dfsStack = new Stack<MapNode>();
-
-                MapNode start = nodes[row, col];
-                start.areaID = -forestCount;
-                start.type = 'F';
-                isVisit[start.row, start.col] = true;
-                dfsStack.Push(start);
-
-                while (dfsStack.Count > 0)
+                for (int i = 0; i < 4; i++)
                 {
-                    MapNode cur = dfsStack.Pop();
+                    int adjRow = row + dr[i];
+                    int adjCol = col + dc[i];
 
-                    for (int k = 0; k < 4; k++)
-                    {
-                        int nextRow = cur.row + dr[k];
-                        int nextCol = cur.col + dc[k];
+                    if (adjRow < 0 || adjCol < 0 || adjRow >= height || adjCol >= width) continue;
+                    if (nodes[adjRow, adjCol].type == 'O') continue;
+                    if (nodes[adjRow, adjCol].type == ' ') continue;
 
-                        if (nextRow < 0 || nextCol < 0 || nextRow >= height || nextCol >= width) continue;
-                        if (nodes[nextRow, nextCol].areaID >= 0) continue;
-                        if (isVisit[nextRow, nextCol]) continue;
-
-                        isVisit[nextRow, nextCol] = true;
-                        MapNode next = nodes[nextRow, nextCol];
-
-                        if (IsForestBorder(next))
-                        {
-                            next.areaID = cur.areaID;
-                            next.type = cur.type;
-                            dfsStack.Push(next);
-                        }
-                    }
+                    nodes[row, col].type = 'O';
+                    break;
                 }
             }
         }
-
     }
+
     private MapData BuildMapData()
     {
         MapData mapData = new MapData
         {
             resolution = new Vector2Int(width, height),
             map = new char[height, width],
+            value = new float[height, width]
         };
 
         for (int row = 0; row < height; row++)
@@ -408,6 +361,7 @@ public class MapDataGenerator
             for (int col = 0; col < width; col++)
             {
                 mapData.map[row, col] = nodes[row, col].type;
+                mapData.value[row, col] = nodes[row, col].perlin;
             }
         }
 
@@ -427,33 +381,5 @@ public class MapDataGenerator
         if (parents[id] != id) parents[id] = Find(parents[id], parents);
 
         return parents[id];
-    }
-
-    private bool IsForestBorder(MapNode node)
-    {
-        if (node.areaID >= 0) return false;
-        if (node.type == 'A' || node.type == 'R') return false;
-
-        bool isBorder = false;
-
-        int[] dr = new int[8] { 0, 0, 1, 1, 1, -1, -1, -1 };
-        int[] dc = new int[8] { 1, -1, 0, 1, -1, 0, 1, -1 };
-
-        for (int k = 0; k < 8; k++)
-        {
-            int nextRow = node.row + dr[k];
-            int nextCol = node.col + dc[k];
-
-            if (nextRow < 0 || nextCol < 0 || nextRow >= height || nextCol >= width)
-            {
-                isBorder = true;
-                continue;
-            }
-
-            if (nodes[nextRow, nextCol].areaID >= 0) isBorder = true;
-            if (nodes[nextRow, nextCol].type == 'A' || nodes[nextRow, nextCol].type == 'R') isBorder = true;
-        }
-
-        return isBorder;
     }
 }

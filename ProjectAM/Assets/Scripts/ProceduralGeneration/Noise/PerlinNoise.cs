@@ -9,11 +9,11 @@ public class PerlinNoise
     private const float NoiseMinValue = -9.0f;
 
     private NoiseSettings noiseSettings;
-    private int[,] noiseValue;
+    private float[,] noiseValue;
     private Texture2D noiseTexture;
 
     public NoiseSettings NoiseSettings => noiseSettings;
-    public int[,] NoiseValue => noiseValue;
+    public float[,] NoiseValue => noiseValue;
     public Texture2D NoiseTexture => noiseTexture;
 
     public void GenerateNoise(NoiseSettings noiseSettings)
@@ -25,7 +25,7 @@ public class PerlinNoise
         int width = noiseSettings.resolution.x;
         int height = noiseSettings.resolution.y;
 
-        noiseValue = new int[height, width];
+        noiseValue = new float[height, width];
         noiseTexture = new Texture2D(width, height);
         Color[] pixels = new Color[width * height];
 
@@ -76,7 +76,7 @@ public class PerlinNoise
                 float perlin = Mathf.Lerp(interpolatedTop, interpolatedBottom, smoothUV.y);
                 perlin = Mathf.Clamp(perlin * NoiseAmplitude, NoiseMinValue, NoiseMaxValue);
 
-                noiseValue[row, col] = Mathf.RoundToInt(perlin);
+                noiseValue[row, col] = perlin;
                 pixels[row * width + col] = ToGrayscaleColor(perlin);
             }
         }
@@ -99,7 +99,7 @@ public class PerlinNoise
         {
             for (int col = 0; col < noiseValue.GetLength(1); col++)
             {
-                int value = noiseValue[row, col];
+                int value = Mathf.FloorToInt(noiseValue[row, col]);
                 if (value >= 0)
                 {
                     stringBuilder.Append(value);
