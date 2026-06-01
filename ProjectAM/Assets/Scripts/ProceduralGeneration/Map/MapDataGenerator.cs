@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI.Table;
 
 public class MapDataGenerator
 {
@@ -27,10 +26,14 @@ public class MapDataGenerator
         return MapData;
     }
 
-    public MapData GenerateSimpleMapData(PerlinNoise perlinNoise)
+    public MapData GenerateMapData(CellularAutomata cellularAutomata)
     {
-        GenerateSimpleFieldData(perlinNoise);
+        MapData = BuildMapData();
+        return MapData;
+    }
 
+    public MapData GenerateMapData(PerlinNoise perlinNoise, CellularAutomata cellularAutomata)
+    {
         MapData = BuildMapData();
         return MapData;
     }

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer), typeof(MeshCollider))]
-public class CellularAutomataMarchingSquaresTerrain : MonoBehaviour
+public class MarchingSquaresTerrain : MonoBehaviour
 {
     [SerializeField]
     private float tileSize = 1f;
@@ -23,26 +23,12 @@ public class CellularAutomataMarchingSquaresTerrain : MonoBehaviour
         meshRenderer.sharedMaterial = CreateDefaultMaterial();
     }
 
-    public void Build()
+    public void Build(float[,] values)
     {
-        CellularAutomata cellularAutomata = new CellularAutomata();
-        CellularAutomataSettings settings = new CellularAutomataSettings
-        {
-            width = 128,
-            height = 128,
-            fillPercentage = 50,
-            smoothIterations = 5,
-            blurIterations = 3
-        };
-
-        float[,] cellularMap = cellularAutomata.GenerateCellularMap(settings);
-
-        Mesh mesh = GenerateMesh(cellularMap);
-        mesh.name = "Cellular Automata Marching Squares Terrain";
+        Mesh mesh = GenerateMesh(values);
+        mesh.name = "Marching Squares Terrain";
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
-
-        Debug.Log($"Cellular Automata Marching Squares Terrain: vertices={mesh.vertexCount}, triangles={mesh.triangles.Length / 3}");
     }
 
     private Mesh GenerateMesh(float[,] cellularMap)
@@ -142,7 +128,7 @@ public class CellularAutomataMarchingSquaresTerrain : MonoBehaviour
 
         Mesh mesh = new Mesh();
         if (vertices.Count > 65000) mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
-        
+
         mesh.SetVertices(vertices);
         mesh.SetTriangles(triangles, 0);
         mesh.SetNormals(normals);

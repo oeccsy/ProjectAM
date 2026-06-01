@@ -6,23 +6,26 @@ public class CellularAutomata
     private float[,] cellularMap;
     private float[,] tempMap;
 
+    public CellularAutomataSettings CellularAutomataSettings => settings;
+    public float[,] CellularMap => cellularMap;
+
     public float[,] GenerateCellularMap(CellularAutomataSettings settings)
     {
         this.settings = settings;
 
-        cellularMap = new float[settings.height, settings.width];
-        tempMap = new float[settings.height, settings.width];
+        cellularMap = new float[settings.resolution.y, settings.resolution.x];
+        tempMap = new float[settings.resolution.y, settings.resolution.x];
         
         FillRandom(cellularMap, settings.fillPercentage);
 
         for (int i=0; i<settings.smoothIterations; i++)
         {
-            Smooth(cellularMap);
+            Smooth(cellularMap, 2, 12);
         }
 
         for (int i=0; i<settings.blurIterations; i++)
         {
-            Blur(cellularMap);
+            Blur(cellularMap, 2);
         }
 
         return cellularMap;
