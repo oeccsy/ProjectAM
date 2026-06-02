@@ -6,4 +6,6 @@ public class CellularAutomataSettings
     public int fillPercentage;
     public int smoothIterations;
     public int blurIterations;
+
+    public int neighborRange;
 }

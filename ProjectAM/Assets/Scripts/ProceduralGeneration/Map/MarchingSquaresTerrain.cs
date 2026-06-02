@@ -5,7 +5,7 @@ using UnityEngine;
 public class MarchingSquaresTerrain : MonoBehaviour
 {
     [SerializeField]
-    private float tileSize = 1f;
+    private float tileSize = 1.0f;
     [SerializeField]
     private float topHeight = 1.0f;
     [SerializeField]
@@ -43,9 +43,9 @@ public class MarchingSquaresTerrain : MonoBehaviour
 
         MarchingSquares marchingSquares = new MarchingSquares();
 
-        for (int row = 0; row < height - 1; row++)
+        for (int row = 0; row < height; row++)
         {
-            for (int col = 0; col < width - 1; col++)
+            for (int col = 0; col < width; col++)
             {
                 MarchingSquares.CellData cellData = marchingSquares.Sample(cellularMap, row, col);
 

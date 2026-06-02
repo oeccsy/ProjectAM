@@ -22,7 +22,7 @@ public class MapGenerator
         {
             for(int col = 0; col < mapData.resolution.x; col++)
             {
-                if (mapData.map[row, col] == 'O')
+                if (mapData.fieldTypes[row, col] == 'O')
                 {
                     Vector2Int start = new Vector2Int(col, row);
                     rawLoop.Add(start);
@@ -49,7 +49,7 @@ public class MapGenerator
 
                 if (nextPos.x < 0 || nextPos.y < 0 || nextPos.x >= mapData.resolution.x || nextPos.y >= mapData.resolution.y) continue;
                 if (isVisited[nextPos.y, nextPos.x]) continue;
-                if (mapData.map[nextPos.y, nextPos.x] != 'O') continue;
+                if (mapData.fieldTypes[nextPos.y, nextPos.x] != 'O') continue;
 
                 rawLoop.Add(nextPos);
                 isVisited[nextPos.y, nextPos.x] = true;

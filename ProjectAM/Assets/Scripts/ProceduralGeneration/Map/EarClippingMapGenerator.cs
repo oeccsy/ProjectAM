@@ -52,7 +52,7 @@ public class EarClippingMapGenerator : MonoBehaviour
 
     public void Build(MapData mapData)
     {
-        float[,] field = mapData.value;
+        float[,] field = mapData.values;
         List<Segment> segments = CreateMarchingSegments(field, 0.5f);
         List<Vector2> contour = ConnectLargestLoop(segments);
 

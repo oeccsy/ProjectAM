@@ -22,7 +22,8 @@ public class SimulationScene : MonoBehaviour
             resolution = new Vector2Int(64, 64),
             fillPercentage = 50,
             smoothIterations = 5,
-            blurIterations = 3
+            blurIterations = 3,
+            neighborRange = 2
         };
 
         cellularAutomata.GenerateCellularMap(settings);
@@ -38,11 +39,14 @@ public class SimulationScene : MonoBehaviour
         
         GameObject terrainObjectD = new GameObject("Perlin Noise Terrain");
         MarchingSquaresTerrain terrainD = terrainObjectD.AddComponent<MarchingSquaresTerrain>();
-        terrainD.Build(mapData.value);
+        terrainD.Build(mapData.values);
         */
 
         GameObject terrainObjectE = new GameObject("Cellular Automata Terrain");
         MarchingSquaresTerrain terrainE = terrainObjectE.AddComponent<MarchingSquaresTerrain>();
         terrainE.Build(cellularAutomata.CellularMap);
+
+        MapGridDebugRenderer gridDebug = terrainObjectE.AddComponent<MapGridDebugRenderer>();
+        gridDebug.BindScalaField(cellularAutomata.CellularMap);
     }
 }

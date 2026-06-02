@@ -52,7 +52,7 @@ public class MapDataGenerator
         {
             for (int col = 0; col < width; col++)
             {
-                char value = MapData.map[row, col];
+                char value = MapData.fieldTypes[row, col];
                 stringBuilder.Append(value);
             }
 
@@ -355,16 +355,16 @@ public class MapDataGenerator
         MapData mapData = new MapData
         {
             resolution = new Vector2Int(width, height),
-            map = new char[height, width],
-            value = new float[height, width]
+            fieldTypes = new char[height, width],
+            values = new float[height, width]
         };
 
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
-                mapData.map[row, col] = nodes[row, col].type;
-                mapData.value[row, col] = nodes[row, col].perlin;
+                mapData.fieldTypes[row, col] = nodes[row, col].type;
+                mapData.values[row, col] = nodes[row, col].perlin;
             }
         }
 

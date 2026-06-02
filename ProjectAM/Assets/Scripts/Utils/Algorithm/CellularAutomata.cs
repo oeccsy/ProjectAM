@@ -18,14 +18,17 @@ public class CellularAutomata
         
         FillRandom(cellularMap, settings.fillPercentage);
 
+        int range = settings.neighborRange;
+        int neighborThreshold = 2 * range * (range + 1);
+
         for (int i=0; i<settings.smoothIterations; i++)
         {
-            Smooth(cellularMap, 2, 12);
+            Smooth(cellularMap, range, neighborThreshold);
         }
 
         for (int i=0; i<settings.blurIterations; i++)
         {
-            Blur(cellularMap, 2);
+            Blur(cellularMap, range);
         }
 
         return cellularMap;

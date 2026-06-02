@@ -8,12 +8,14 @@ public class MarchingSquares
         public readonly Vector2[] points;
         public readonly int[] contours;
         public readonly int[] triangles;
+        public readonly int mask;
 
-        public CellData(Vector2[] points, int[] contours, int[] triangles)
+        public CellData(Vector2[] points, int[] contours, int[] triangles, int mask)
         {
             this.points = points;
             this.contours = contours;
             this.triangles = triangles;
+            this.mask = mask;
         }
     }
 
@@ -88,17 +90,17 @@ public class MarchingSquares
         { 10, new int[] { TopLeft, Bottom, Left, TopLeft, BottomRight, Bottom, TopLeft, Right, BottomRight, TopLeft, Top, Right } }
     };
 
-    public CellData Sample(float[,] field, int row, int col, float threshold = 0.5f)
+    public CellData Sample(float[,] field, int row, int col, float tileSize = 1.0f, float threshold = 0.5f)
     {
-        float topLeftValue = field[row, col];
-        float topRightValue = field[row, col + 1];
-        float bottomRightValue = field[row + 1, col + 1];
-        float bottomLeftValue = field[row + 1, col];
+        float topLeftValue = CornerValue(field, row, col, TopLeft);
+        float topRightValue = CornerValue(field, row, col, TopRight);
+        float bottomRightValue = CornerValue(field, row, col, BottomRight);
+        float bottomLeftValue = CornerValue(field, row, col, BottomLeft);
 
-        Vector2 topLeft = FieldPoint(row, col);
-        Vector2 topRight = FieldPoint(row, col + 1);
-        Vector2 bottomRight = FieldPoint(row + 1, col + 1);
-        Vector2 bottomLeft = FieldPoint(row + 1, col);
+        Vector2 topLeft = FieldPoint(row, col, 1, tileSize);
+        Vector2 topRight = FieldPoint(row, col + 1, 1, tileSize);
+        Vector2 bottomRight = FieldPoint(row + 1, col + 1, 1, tileSize);
+        Vector2 bottomLeft = FieldPoint(row + 1, col, 1, tileSize);
 
         Vector2 top = Interpolate(topLeft, topRight, topLeftValue, topRightValue);
         Vector2 right = Interpolate(topRight, bottomRight, topRightValue, bottomRightValue);
@@ -134,8 +136,37 @@ public class MarchingSquares
             }
         }
 
-        CellData cellData = new CellData(points, contours, triangles);
+        CellData cellData = new CellData(points, contours, triangles, mask);
         return cellData;
+    }
+
+    private float CornerValue(float[,] field, int row, int col, int corner)
+    {
+        int height = field.GetLength(0);
+        int width = field.GetLength(1);
+
+        float sum = 0f;
+        int count = 0;
+
+        for(int dr = -1; dr <= 1; dr++)
+        {
+            for(int dc = -1; dc <= 1; dc++)
+            {
+                if (corner == TopLeft && (dr == 1 || dc == 1)) continue;
+                if (corner == TopRight && (dr == 1 || dc == -1)) continue;
+                if (corner == BottomRight && (dr == -1 || dc == -1)) continue;
+                if (corner == BottomLeft && (dr == -1 || dc == 1)) continue;
+
+                int adjRow = row + dr;
+                int adjCol = col + dc;
+                if (adjRow < 0 || adjCol < 0 || adjRow >= height || adjCol >= width) continue;
+
+                sum += field[adjRow, adjCol];
+                count++;
+            }
+        }
+
+        return (count > 0) ? (sum / count) : 0f;
     }
 
     private Vector2 FieldPoint(int row, int col, int samplesPerTile = 1, float tileSize = 1.0f, float padding = 1.0f)
