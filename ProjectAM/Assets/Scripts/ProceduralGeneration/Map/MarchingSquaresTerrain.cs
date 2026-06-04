@@ -23,23 +23,24 @@ public class MarchingSquaresTerrain : MonoBehaviour
         meshRenderer.sharedMaterial = CreateDefaultMaterial();
     }
 
-    public void Build(float[,] values)
+    public void Build(MapData mapData)
     {
-        Mesh mesh = GenerateMesh(values);
+        Mesh mesh = GenerateMesh(mapData);
         mesh.name = "Marching Squares Terrain";
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
     }
 
-    private Mesh GenerateMesh(float[,] cellularMap)
+    private Mesh GenerateMesh(MapData mapData)
     {
         List<Vector3> vertices = new List<Vector3>();
         List<int> triangles = new List<int>();
         List<Vector3> normals = new List<Vector3>();
         List<Vector2> uvs = new List<Vector2>();
 
-        int height = cellularMap.GetLength(0);
-        int width = cellularMap.GetLength(1);
+        int height = mapData.resolution.y;
+        int width = mapData.resolution.x;
+        float[,] values = mapData.values;
 
         MarchingSquares marchingSquares = new MarchingSquares();
 
@@ -47,7 +48,7 @@ public class MarchingSquaresTerrain : MonoBehaviour
         {
             for (int col = 0; col < width; col++)
             {
-                MarchingSquares.CellData cellData = marchingSquares.Sample(cellularMap, row, col);
+                MarchingSquares.CellData cellData = marchingSquares.Sample(values, row, col);
 
                 for (int i = 0; i < cellData.triangles.Length; i += 3)
                 {

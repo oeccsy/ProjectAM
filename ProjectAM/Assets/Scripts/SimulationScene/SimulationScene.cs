@@ -34,7 +34,7 @@ public class SimulationScene : MonoBehaviour
 
         GameObject terrainObject = new GameObject("Marching Squares Terrain");
         MarchingSquaresTerrain terrainE = terrainObject.AddComponent<MarchingSquaresTerrain>();
-        terrainE.Build(mapData.values);
+        terrainE.Build(mapData);
 
         MapGridDebugRenderer gridDebug = terrainObject.AddComponent<MapGridDebugRenderer>();
         gridDebug.BindMapData(mapData);
