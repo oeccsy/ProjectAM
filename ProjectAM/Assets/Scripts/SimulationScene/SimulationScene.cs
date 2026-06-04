@@ -16,7 +16,6 @@ public class SimulationScene : MonoBehaviour
         perlinNoise.PrintNoise();
         DebugUtils.ShowTexture(perlinNoise.NoiseTexture);
 
-        CellularAutomata cellularAutomata = new CellularAutomata();
         CellularAutomataSettings settings = new CellularAutomataSettings
         {
             resolution = new Vector2Int(64, 64),
@@ -26,27 +25,18 @@ public class SimulationScene : MonoBehaviour
             neighborRange = 2
         };
 
+        CellularAutomata cellularAutomata = new CellularAutomata();
         cellularAutomata.GenerateCellularMap(settings);
 
         MapDataGenerator mapDataGenerator = new MapDataGenerator();
-        MapData mapData = mapDataGenerator.GenerateMapData(perlinNoise);
+        MapData mapData = mapDataGenerator.GenerateMapData(cellularAutomata);
         mapDataGenerator.PrintMapData();
 
-        /*
-        GameObject terrainObjectB = new GameObject("EarClipping Terrain");
-        EarClippingMapGenerator marchingSquaresMapGenerator = terrainObjectB.AddComponent<EarClippingMapGenerator>();
-        marchingSquaresMapGenerator.Build(mapData);
-        
-        GameObject terrainObjectD = new GameObject("Perlin Noise Terrain");
-        MarchingSquaresTerrain terrainD = terrainObjectD.AddComponent<MarchingSquaresTerrain>();
-        terrainD.Build(mapData.values);
-        */
+        GameObject terrainObject = new GameObject("Marching Squares Terrain");
+        MarchingSquaresTerrain terrainE = terrainObject.AddComponent<MarchingSquaresTerrain>();
+        terrainE.Build(mapData.values);
 
-        GameObject terrainObjectE = new GameObject("Cellular Automata Terrain");
-        MarchingSquaresTerrain terrainE = terrainObjectE.AddComponent<MarchingSquaresTerrain>();
-        terrainE.Build(cellularAutomata.CellularMap);
-
-        MapGridDebugRenderer gridDebug = terrainObjectE.AddComponent<MapGridDebugRenderer>();
-        gridDebug.BindScalaField(cellularAutomata.CellularMap);
+        MapGridDebugRenderer gridDebug = terrainObject.AddComponent<MapGridDebugRenderer>();
+        gridDebug.BindMapData(mapData);
     }
 }

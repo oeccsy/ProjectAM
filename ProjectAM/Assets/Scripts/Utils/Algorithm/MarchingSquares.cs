@@ -90,17 +90,17 @@ public class MarchingSquares
         { 10, new int[] { TopLeft, Bottom, Left, TopLeft, BottomRight, Bottom, TopLeft, Right, BottomRight, TopLeft, Top, Right } }
     };
 
-    public CellData Sample(float[,] field, int row, int col, float tileSize = 1.0f, float threshold = 0.5f)
+    public CellData Sample(float[,] field, int row, int col, float threshold = 0.5f)
     {
         float topLeftValue = CornerValue(field, row, col, TopLeft);
         float topRightValue = CornerValue(field, row, col, TopRight);
         float bottomRightValue = CornerValue(field, row, col, BottomRight);
         float bottomLeftValue = CornerValue(field, row, col, BottomLeft);
 
-        Vector2 topLeft = FieldPoint(row, col, 1, tileSize);
-        Vector2 topRight = FieldPoint(row, col + 1, 1, tileSize);
-        Vector2 bottomRight = FieldPoint(row + 1, col + 1, 1, tileSize);
-        Vector2 bottomLeft = FieldPoint(row + 1, col, 1, tileSize);
+        Vector2 topLeft = new Vector2(col - 0.5f, -(row - 0.5f));
+        Vector2 topRight = new Vector2(col + 0.5f, -(row - 0.5f));
+        Vector2 bottomRight = new Vector2(col + 0.5f, -(row + 0.5f));
+        Vector2 bottomLeft = new Vector2(col - 0.5f, -(row + 0.5f));
 
         Vector2 top = Interpolate(topLeft, topRight, topLeftValue, topRightValue);
         Vector2 right = Interpolate(topRight, bottomRight, topRightValue, bottomRightValue);
@@ -128,8 +128,7 @@ public class MarchingSquares
 
         if ((mask == 5) || (mask == 10))
         {
-            float centerValue = (topLeftValue + topRightValue + bottomRightValue + bottomLeftValue) * 0.25f;
-            if(centerValue > threshold)
+            if(field[row, col] > threshold)
             {
                 contours = AmbiguousCaseConnectedEdgeTable[mask];
                 triangles = AmbiguousCaseConnectedTriangleTable[mask];
@@ -167,14 +166,6 @@ public class MarchingSquares
         }
 
         return (count > 0) ? (sum / count) : 0f;
-    }
-
-    private Vector2 FieldPoint(int row, int col, int samplesPerTile = 1, float tileSize = 1.0f, float padding = 1.0f)
-    {
-        float mapX = col / (float)samplesPerTile - padding;
-        float mapY = row / (float)samplesPerTile - padding;
-
-        return new Vector2(mapX * tileSize, -mapY * tileSize);
     }
 
     private Vector2 Interpolate(Vector2 p1, Vector2 p2, float v1, float v2, float threshold = 0.5f)

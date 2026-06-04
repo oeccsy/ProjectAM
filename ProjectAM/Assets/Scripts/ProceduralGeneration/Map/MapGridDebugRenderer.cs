@@ -1,62 +1,67 @@
+using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
 
-// 원본 배열을 타일 테두리로 시각화하는 디버그용 컴포넌트.
-// MarchingSquaresTerrain과 같은 GameObject에 붙여 좌표를 메쉬와 맞춘다.
-// 전체 격자(gridColor) 위에 solid 셀(solidColor)을 덧그린다.
 public class MapGridDebugRenderer : MonoBehaviour
 {
     [SerializeField]
-    private float threshold = 0.5f;
-    [SerializeField]
     private float tileSize = 1.0f;
-    [SerializeField]
-    private float padding = 1.0f;
     [SerializeField]
     private float height = 1.0f;
     [SerializeField]
-    private Color gridColor = new Color(1f, 1f, 1f, 0.15f);
+    private Color gridColor = new Color(1f, 1f, 1f, 0.01f);
     [SerializeField]
-    private Color solidColor = new Color(0.2f, 1f, 0.3f, 0.8f);
+    private Color fieldColor = new Color(0.2f, 1f, 0.3f, 0.8f);
+    [SerializeField]
+    private Color bridgeColor = new Color(1f, 0.2f, 0.2f, 0.8f);
 
-    private float[,] map;
+    private MapData mapData;
 
-    public void BindScalaField(float[,] map)
+    public void BindMapData(MapData mapData)
     {
-        this.map = map;
+        this.mapData = mapData;
     }
 
     private void OnDrawGizmos()
     {
-        if (map == null) return;
+        if (mapData == null) return;
 
-        int rows = map.GetLength(0);
-        int cols = map.GetLength(1);
+        int height = mapData.resolution.y;
+        int width = mapData.resolution.x;
 
         Gizmos.color = gridColor;
-        for (int row = 0; row < rows; row++)
+        for (int row = 0; row < height; row++)
         {
-            for (int col = 0; col < cols; col++)
+            for (int col = 0; col < width; col++)
             {
                 DrawCellBorder(row, col);
             }
         }
 
-        Gizmos.color = solidColor;
-        for (int row = 0; row < rows; row++)
+        Gizmos.color = fieldColor;
+        for (int row = 0; row < height; row++)
         {
-            for (int col = 0; col < cols; col++)
+            for (int col = 0; col < width; col++)
             {
-                if (map[row, col] > threshold) DrawCellBorder(row, col);
+                if(mapData.fieldTypes[row, col] == 'A') DrawCellBorder(row, col);
+            }
+        }
+
+        Gizmos.color = bridgeColor;
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                if(mapData.fieldTypes[row, col] == 'B') DrawCellBorder(row, col);
             }
         }
     }
 
     private void DrawCellBorder(int row, int col)
     {
-        Vector3 topLeft = CornerToWorld(row, col);
-        Vector3 topRight = CornerToWorld(row, col + 1);
-        Vector3 bottomRight = CornerToWorld(row + 1, col + 1);
-        Vector3 bottomLeft = CornerToWorld(row + 1, col);
+        Vector3 topLeft = GridToWorld(col - 0.5f, -(row - 0.5f));
+        Vector3 topRight = GridToWorld(col + 0.5f, -(row - 0.5f));
+        Vector3 bottomRight = GridToWorld(col + 0.5f, -(row + 0.5f));
+        Vector3 bottomLeft = GridToWorld(col - 0.5f, -(row + 0.5f));
 
         Gizmos.DrawLine(topLeft, topRight);
         Gizmos.DrawLine(topRight, bottomRight);
@@ -64,11 +69,8 @@ public class MapGridDebugRenderer : MonoBehaviour
         Gizmos.DrawLine(bottomLeft, topLeft);
     }
 
-    // MarchingSquares.FieldPoint와 동일한 인덱스 → 위치 매핑.
-    private Vector3 CornerToWorld(int row, int col)
+    private Vector3 GridToWorld(float x, float y)
     {
-        float x = (col - padding) * tileSize;
-        float z = -(row - padding) * tileSize;
-        return transform.TransformPoint(new Vector3(x, height, z));
+        return transform.TransformPoint(new Vector3(x * tileSize, height, y * tileSize));
     }
 }

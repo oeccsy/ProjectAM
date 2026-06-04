@@ -20,6 +20,7 @@ public class MapDataGenerator
     public MapData GenerateMapData(PerlinNoise perlinNoise)
     {
         GenerateFieldData(perlinNoise);
+        GenerateBridges();
         GenerateOutlineData();
 
         MapData = BuildMapData();
@@ -28,6 +29,9 @@ public class MapDataGenerator
 
     public MapData GenerateMapData(CellularAutomata cellularAutomata)
     {
+        GenerateFieldData(cellularAutomata);
+        GenerateBridges();
+        
         MapData = BuildMapData();
         return MapData;
     }
@@ -62,35 +66,71 @@ public class MapDataGenerator
         Debug.Log(stringBuilder.ToString());
     }
 
-    private void GenerateFieldData(PerlinNoise perlinNoise)
+    private void GenerateFieldData(PerlinNoise perlinNoise, float threshold = 1.0f)
     {
-        width = perlinNoise.NoiseSettings.resolution.x;
         height = perlinNoise.NoiseSettings.resolution.y;
-        areaCount = 0;
+        width = perlinNoise.NoiseSettings.resolution.x;
 
-        // 노드 초기화
         nodes = new MapNode[height, width];
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
                 float perlin = perlinNoise.NoiseValue[row, col];
-                nodes[row, col] = new MapNode
+                
+                MapNode curNode = new MapNode
                 {
                     row = row,
                     col = col,
-                    perlin = perlin,
+                    value = perlin,
                     areaID = Undefined,
-                    type = (perlin >= 1) ? 'A' : ' '
+                    type = (perlin >= threshold) ? 'A' : ' '
                 };
-
-                if(row == 0 || col == 0 || row == height - 1 || col == width - 1)
+                
+                if (row == 0 || col == 0 || row == height - 1 || col == width - 1)
                 {
-                    nodes[row, col].perlin = 0.0f;
-                    nodes[row, col].type = ' ';
+                    curNode.value = 0.0f;
+                    curNode.type = ' ';
                 }
+
+                nodes[row, col] = curNode;
             }
         }
+    }
+
+    private void GenerateFieldData(CellularAutomata cellularAutomata)
+    {
+        height = cellularAutomata.CellularAutomataSettings.resolution.y;
+        width = cellularAutomata.CellularAutomataSettings.resolution.x;
+
+        nodes = new MapNode[height, width];
+
+        MarchingSquares marchingSquares = new MarchingSquares();
+
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                MapNode curNode = new MapNode
+                {
+                    row = row,
+                    col = col,
+                    value = cellularAutomata.CellularMap[row, col],
+                    areaID = Undefined,
+                    type = ' '
+                };
+
+                MarchingSquares.CellData cellData = marchingSquares.Sample(cellularAutomata.CellularMap, row, col);
+                if (cellData.mask == 15) curNode.type = 'A';
+
+                nodes[row, col] = curNode;
+            }
+        }
+    }
+
+    private void GenerateBridges()
+    {
+        areaCount = 0;
 
         // BFS : 영역 구분
         List<List<MapNode>> boundaryNodesByArea = new List<List<MapNode>>();
@@ -282,8 +322,7 @@ public class MapDataGenerator
                     Debug.Log("Error: Path should only go through empty nodes. Check BFS path tracking logic.");
                 }
 
-                nodes[path.row, path.col].type = 'R';
-                nodes[path.row, path.col].perlin = 1.0f;
+                nodes[path.row, path.col].type = 'B';
                 path = prev[path.row, path.col];
             }
 
@@ -291,35 +330,6 @@ public class MapDataGenerator
             unionCount++;
             
             if (unionCount == areaCount - 1) break;
-        }
-    }
-
-    private void GenerateSimpleFieldData(PerlinNoise perlinNoise)
-    {
-        width = perlinNoise.NoiseSettings.resolution.x;
-        height = perlinNoise.NoiseSettings.resolution.y;
-
-        nodes = new MapNode[height, width];
-        for (int row = 0; row < height; row++)
-        {
-            for (int col = 0; col < width; col++)
-            {
-                float perlin = perlinNoise.NoiseValue[row, col];
-                nodes[row, col] = new MapNode
-                {
-                    row = row,
-                    col = col,
-                    perlin = perlin,
-                    areaID = Undefined,
-                    type = (perlin >= 1) ? 'A' : ' '
-                };
-
-                if (row == 0 || col == 0 || row == height - 1 || col == width - 1)
-                {
-                    nodes[row, col].perlin = 0.0f;
-                    nodes[row, col].type = ' ';
-                }
-            }
         }
     }
 
@@ -355,16 +365,18 @@ public class MapDataGenerator
         MapData mapData = new MapData
         {
             resolution = new Vector2Int(width, height),
+            values = new float[height, width],
             fieldTypes = new char[height, width],
-            values = new float[height, width]
+            areaID = new int[height, width]
         };
 
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
+                mapData.values[row, col] = nodes[row, col].value;
                 mapData.fieldTypes[row, col] = nodes[row, col].type;
-                mapData.values[row, col] = nodes[row, col].perlin;
+                mapData.areaID[row, col] = nodes[row, col].areaID;
             }
         }
 
