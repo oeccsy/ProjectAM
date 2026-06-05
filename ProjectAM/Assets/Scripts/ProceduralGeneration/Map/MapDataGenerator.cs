@@ -10,6 +10,7 @@ public class MapDataGenerator
 
     private MapNode[,] nodes;
     private AreaEdge[,] areaAdj;
+    private List<House> houses;
 
     private int width;
     private int height;
@@ -31,6 +32,7 @@ public class MapDataGenerator
     {
         GenerateFieldData(cellularAutomata);
         GenerateBridges();
+        GenerateHouseData(3);
         
         MapData = BuildMapData();
         return MapData;
@@ -360,6 +362,73 @@ public class MapDataGenerator
         }
     }
 
+    private void GenerateHouseData(int amount)
+    {
+        houses = new List<House>();
+
+        StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
+        if (config == null)
+        {
+            Debug.LogWarning("StructureConfig not found at Resources/Data/StructureConfig.");
+            return;
+        }
+
+        List<Vector2Int> candidates = new List<Vector2Int>();
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                if (nodes[row, col].type == 'A') candidates.Add(new Vector2Int(col, row));
+            }
+        }
+            
+        Utils.Shuffle<Vector2Int>(candidates);
+
+        for (int i = 0; i < amount; i++)
+        {
+            int random = UnityEngine.Random.Range(0, config.structures.Length);
+            StructureConfig.Info info = config.structures[random];
+
+            foreach (Vector2Int pos in candidates)
+            {
+                bool canPlace = true;
+                for (int row = pos.y; row < pos.y + info.tileSize.y; row++)
+                {
+                    for (int col = pos.x; col < pos.x + info.tileSize.x; col++)
+                    {
+                        if (row < 0 || col < 0 || row >= height || col >= width) canPlace = false;
+                        if (nodes[row, col].type != 'A') canPlace = false;
+                        if (!canPlace) break;
+                    }                        
+
+                    if (!canPlace) break;
+                }
+                    
+                if (!canPlace) continue;
+
+                for (int row = pos.y; row < pos.y + info.tileSize.y; row++)
+                {
+                    for (int col = pos.x; col < pos.x + info.tileSize.x; col++)
+                    {
+                        nodes[row, col].type = 'H';
+                    }
+                }
+                
+                House newHouse = new House
+                {
+                    owner = "",
+                    assetType = info.assetName,
+                    origin = pos + info.origin,
+                    tileSize = info.tileSize
+                };
+                
+                houses.Add(newHouse);
+
+                break;
+            }
+        }
+    }
+
     private MapData BuildMapData()
     {
         MapData mapData = new MapData
@@ -367,7 +436,8 @@ public class MapDataGenerator
             resolution = new Vector2Int(width, height),
             values = new float[height, width],
             fieldTypes = new char[height, width],
-            areaID = new int[height, width]
+            areaID = new int[height, width],
+            houses = houses ?? new List<House>()
         };
 
         for (int row = 0; row < height; row++)

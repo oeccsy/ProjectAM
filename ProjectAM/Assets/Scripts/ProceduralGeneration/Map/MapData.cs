@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapData
@@ -6,4 +7,5 @@ public class MapData
     public float[,] values;
     public char[,] fieldTypes;
     public int[,] areaID;
+    public List<House> houses;
 }
