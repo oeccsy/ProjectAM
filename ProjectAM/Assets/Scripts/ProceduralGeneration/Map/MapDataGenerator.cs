@@ -363,7 +363,7 @@ public class MapDataGenerator
 
     private void GenerateHouseData(int amount)
     {
-        houses = new List<House>();
+        List<House> houses = new List<House>();
 
         StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
         if (config == null)
@@ -389,22 +389,24 @@ public class MapDataGenerator
         Utils.Shuffle<Vector2Int>(availables);
 
         // 후보지 탐색
-        List<PlacementCandidate> candidates = new List<PlacementCandidate>();
+        List<Vector2Int> candidates = new List<Vector2Int>();
         int maxCandidateCount = amount * 4;
 
         foreach (Vector2Int anchor in availables)
         {
             if (candidates.Count >= maxCandidateCount) break;
 
-            PlacementCandidate candidate = new PlacementCandidate
+            bool canPlace = true;
+            for (int row = anchor.y; (row < anchor.y + tileSize.y) && canPlace; row++)
             {
-                anchor = anchor,
-                nearestDist = float.MaxValue,
-                nearestCandidate = null,
-                incomingCandidates = new List<PlacementCandidate>()
-            };
+                for (int col = anchor.x; (col < anchor.x + tileSize.x) && canPlace; col++)
+                {
+                    if (row < 0 || col < 0 || row >= height || col >= width) canPlace = false;
+                    if (canPlace && tempFieldTypes[row, col] != 'A') canPlace = false;
+                }
+            }
 
-            if (!candidate.CanPlace(tempFieldTypes, tileSize)) continue;
+            if(!canPlace) continue;
 
             for (int row = anchor.y; row < anchor.y + tileSize.y; row++)
             {
@@ -414,40 +416,19 @@ public class MapDataGenerator
                 }
             }
 
-            candidates.Add(candidate);
+            candidates.Add(anchor);
         }
 
-        // nearestCandidate 찾기
-        foreach (PlacementCandidate candidate in candidates)
-        {
-            PlacementCandidate nearestCandidate = candidate.FindNearestCandidate(candidates);
-            nearestCandidate?.incomingCandidates.Add(candidate);
-        }
-
-        // 가장 가까운 거리를 가진 후보를 제거, amount개만 남을 때까지 반복
+        // ClosestPair의 한 점을 제거, amount개만 남을 때까지 반복
         while (candidates.Count > amount)
         {
-            PlacementCandidate removeTarget = candidates[0];
-            foreach (PlacementCandidate candidate in candidates)
-            {
-                if (candidate.nearestDist < removeTarget.nearestDist) removeTarget = candidate;
-            }
-
-            candidates.Remove(removeTarget);
-            removeTarget.nearestCandidate?.incomingCandidates.Remove(removeTarget);
-
-            foreach (PlacementCandidate adjCandidate in removeTarget.incomingCandidates)
-            {
-                PlacementCandidate nearestCandidate = adjCandidate.FindNearestCandidate(candidates);
-                nearestCandidate?.incomingCandidates.Add(adjCandidate);
-            }
+            ClosestPair closestPair = ClosestPair.Solve(candidates);
+            candidates.RemoveAt(closestPair.indexA);
         }
 
         // 남은 후보들을 실제 배치
-        foreach (PlacementCandidate candidate in candidates)
+        foreach (Vector2Int anchor in candidates)
         {
-            Vector2Int anchor = candidate.anchor;
-
             for (int row = anchor.y; row < anchor.y + tileSize.y; row++)
             {
                 for (int col = anchor.x; col < anchor.x + tileSize.x; col++)
@@ -466,6 +447,8 @@ public class MapDataGenerator
 
             houses.Add(newHouse);
         }
+
+        this.houses = houses;
     }
 
     private MapData BuildMapData()
