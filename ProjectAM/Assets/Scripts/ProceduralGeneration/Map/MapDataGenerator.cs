@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class MapDataGenerator
 {
-    private const int Undefined = -100;
-    private const int MaxWeight = 10000;
+    private const int Undefined = 0;
 
     private MapNode[,] nodes;
     private AreaEdge[,] areaAdj;
@@ -32,7 +31,7 @@ public class MapDataGenerator
     {
         GenerateFieldData(cellularAutomata);
         GenerateBridges();
-        GenerateHouseData(3);
+        GenerateHouseData(6);
         
         MapData = BuildMapData();
         return MapData;
@@ -187,7 +186,7 @@ public class MapDataGenerator
         {
             for (int j = 0; j <= areaCount; j++)
             {
-                areaAdj[i, j] = new AreaEdge { weight = MaxWeight };
+                areaAdj[i, j] = new AreaEdge { weight = int.MaxValue };
             }
         }
 
@@ -255,7 +254,7 @@ public class MapDataGenerator
             {
                 AreaEdge edge = areaAdj[i, j];
 
-                if (edge.weight == 0 || edge.weight == MaxWeight) continue;
+                if (edge.weight == 0 || edge.weight == int.MaxValue) continue;
                 
                 edges.Add(edge);
             }
@@ -373,59 +372,99 @@ public class MapDataGenerator
             return;
         }
 
-        List<Vector2Int> candidates = new List<Vector2Int>();
+        StructureConfig.Info info = config.structures[0];
+        Vector2Int tileSize = info.tileSize;
+
+        char[,] tempFieldTypes = new char[height, width];
+        List<Vector2Int> availables = new List<Vector2Int>();
         for (int row = 0; row < height; row++)
         {
             for (int col = 0; col < width; col++)
             {
-                if (nodes[row, col].type == 'A') candidates.Add(new Vector2Int(col, row));
+                tempFieldTypes[row, col] = nodes[row, col].type;
+                if (nodes[row, col].type == 'A') availables.Add(new Vector2Int(col, row));
             }
         }
-            
-        Utils.Shuffle<Vector2Int>(candidates);
 
-        for (int i = 0; i < amount; i++)
+        Utils.Shuffle<Vector2Int>(availables);
+
+        // 후보지 탐색
+        List<PlacementCandidate> candidates = new List<PlacementCandidate>();
+        int maxCandidateCount = amount * 4;
+
+        foreach (Vector2Int anchor in availables)
         {
-            int random = UnityEngine.Random.Range(0, config.structures.Length);
-            StructureConfig.Info info = config.structures[random];
+            if (candidates.Count >= maxCandidateCount) break;
 
-            foreach (Vector2Int pos in candidates)
+            PlacementCandidate candidate = new PlacementCandidate
             {
-                bool canPlace = true;
-                for (int row = pos.y; row < pos.y + info.tileSize.y; row++)
-                {
-                    for (int col = pos.x; col < pos.x + info.tileSize.x; col++)
-                    {
-                        if (row < 0 || col < 0 || row >= height || col >= width) canPlace = false;
-                        if (nodes[row, col].type != 'A') canPlace = false;
-                        if (!canPlace) break;
-                    }                        
+                anchor = anchor,
+                nearestDist = float.MaxValue,
+                nearestCandidate = null,
+                incomingCandidates = new List<PlacementCandidate>()
+            };
 
-                    if (!canPlace) break;
+            if (!candidate.CanPlace(tempFieldTypes, tileSize)) continue;
+
+            for (int row = anchor.y; row < anchor.y + tileSize.y; row++)
+            {
+                for (int col = anchor.x; col < anchor.x + tileSize.x; col++)
+                {
+                    tempFieldTypes[row, col] = 'H';
                 }
-                    
-                if (!canPlace) continue;
-
-                for (int row = pos.y; row < pos.y + info.tileSize.y; row++)
-                {
-                    for (int col = pos.x; col < pos.x + info.tileSize.x; col++)
-                    {
-                        nodes[row, col].type = 'H';
-                    }
-                }
-                
-                House newHouse = new House
-                {
-                    owner = "",
-                    assetType = info.assetName,
-                    origin = pos + info.origin,
-                    tileSize = info.tileSize
-                };
-                
-                houses.Add(newHouse);
-
-                break;
             }
+
+            candidates.Add(candidate);
+        }
+
+        // nearestCandidate 찾기
+        foreach (PlacementCandidate candidate in candidates)
+        {
+            PlacementCandidate nearestCandidate = candidate.FindNearestCandidate(candidates);
+            nearestCandidate?.incomingCandidates.Add(candidate);
+        }
+
+        // 가장 가까운 거리를 가진 후보를 제거, amount개만 남을 때까지 반복
+        while (candidates.Count > amount)
+        {
+            PlacementCandidate removeTarget = candidates[0];
+            foreach (PlacementCandidate candidate in candidates)
+            {
+                if (candidate.nearestDist < removeTarget.nearestDist) removeTarget = candidate;
+            }
+
+            candidates.Remove(removeTarget);
+            removeTarget.nearestCandidate?.incomingCandidates.Remove(removeTarget);
+
+            foreach (PlacementCandidate adjCandidate in removeTarget.incomingCandidates)
+            {
+                PlacementCandidate nearestCandidate = adjCandidate.FindNearestCandidate(candidates);
+                nearestCandidate?.incomingCandidates.Add(adjCandidate);
+            }
+        }
+
+        // 남은 후보들을 실제 배치
+        foreach (PlacementCandidate candidate in candidates)
+        {
+            Vector2Int anchor = candidate.anchor;
+
+            for (int row = anchor.y; row < anchor.y + tileSize.y; row++)
+            {
+                for (int col = anchor.x; col < anchor.x + tileSize.x; col++)
+                {
+                    nodes[row, col].type = 'H';
+                }
+            }
+
+            House newHouse = new House
+            {
+                owner = "",
+                assetType = info.assetName,
+                origin = anchor + info.origin,
+                tileSize = tileSize
+            };
+
+            houses.Add(newHouse);
         }
     }
 
