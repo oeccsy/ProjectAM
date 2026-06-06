@@ -390,7 +390,7 @@ public class MapDataGenerator
 
         // 후보지 탐색
         List<Vector2Int> candidates = new List<Vector2Int>();
-        int maxCandidateCount = amount * 4;
+        int maxCandidateCount = amount * 10;
 
         foreach (Vector2Int anchor in availables)
         {

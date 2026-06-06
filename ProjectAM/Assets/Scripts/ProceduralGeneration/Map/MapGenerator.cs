@@ -44,7 +44,8 @@ public class MapGenerator
             float worldZ = house.origin.y * tileSize;
             Vector3 worldPos = new Vector3(worldX, topHeight, -worldZ);
 
-            GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, container.transform);
+            Quaternion rotation = Quaternion.Euler(0f, 90f * Random.Range(0, 4), 0f);
+            GameObject instance = Object.Instantiate(prefab, worldPos, rotation, container.transform);
             instance.name = house.assetType;
         }
     }
