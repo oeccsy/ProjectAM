@@ -8,4 +8,5 @@ public class MapData
     public char[,] fieldTypes;
     public int[,] areaID;
     public List<House> houses;
+    public Square square;
 }

@@ -8,7 +8,7 @@ public class StructureConfig : ScriptableObject
     public struct Info
     {
         public string assetName;
-        public Vector2Int tileSize;
+        public Vector2Int size;
         public Vector2Int origin;
     }
 

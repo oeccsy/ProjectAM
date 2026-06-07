@@ -18,11 +18,11 @@ public class SimulationScene : MonoBehaviour
 
         CellularAutomataSettings settings = new CellularAutomataSettings
         {
-            resolution = new Vector2Int(64, 64),
+            resolution = new Vector2Int(100, 100),
             fillPercentage = 50,
             smoothIterations = 5,
             blurIterations = 3,
-            neighborRange = 2
+            neighborRange = 3
         };
 
         CellularAutomata cellularAutomata = new CellularAutomata();

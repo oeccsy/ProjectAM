@@ -15,6 +15,8 @@ public class MapGridDebugRenderer : MonoBehaviour
     private Color bridgeColor = new Color(1f, 0.2f, 0.2f, 0.8f);
     [SerializeField]
     private Color houseColor = new Color(0.2f, 0.4f, 1f, 0.8f);
+    [SerializeField]
+    private Color squareColor = new Color(0.9f, 0.9f, 0.7f, 0.8f);
 
     private MapData mapData;
 
@@ -63,6 +65,15 @@ public class MapGridDebugRenderer : MonoBehaviour
             for (int col = 0; col < width; col++)
             {
                 if(mapData.fieldTypes[row, col] == 'H') DrawCellBorder(row, col);
+            }
+        }
+
+        Gizmos.color = squareColor;
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                if(mapData.fieldTypes[row, col] == 'S') DrawCellBorder(row, col);
             }
         }
     }

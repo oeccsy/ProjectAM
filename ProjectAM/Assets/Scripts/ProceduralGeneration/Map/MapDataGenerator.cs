@@ -7,20 +7,25 @@ public class MapDataGenerator
 {
     private const int Undefined = 0;
 
+    [Header("Field")]
     private MapNode[,] nodes;
     private AreaEdge[,] areaAdj;
-    private List<House> houses;
 
     private int width;
     private int height;
     private int areaCount;
 
+    [Header("Structure")]
+    private List<House> houses;
+    private Square sqaure;
+
+    [Header("Result")]
     public MapData MapData { get; private set; }
 
     public MapData GenerateMapData(PerlinNoise perlinNoise)
     {
         GenerateFieldData(perlinNoise);
-        GenerateBridges();
+        GenerateBridgeData();
         GenerateOutlineData();
 
         MapData = BuildMapData();
@@ -30,9 +35,10 @@ public class MapDataGenerator
     public MapData GenerateMapData(CellularAutomata cellularAutomata)
     {
         GenerateFieldData(cellularAutomata);
-        GenerateBridges();
+        GenerateBridgeData();
         GenerateHouseData(6);
-        
+        GenerateSquareData();
+
         MapData = BuildMapData();
         return MapData;
     }
@@ -129,7 +135,7 @@ public class MapDataGenerator
         }
     }
 
-    private void GenerateBridges()
+    private void GenerateBridgeData()
     {
         areaCount = 0;
 
@@ -373,7 +379,7 @@ public class MapDataGenerator
         }
 
         StructureConfig.Info info = config.structures[0];
-        Vector2Int tileSize = info.tileSize;
+        Vector2Int tileSize = info.size;
 
         char[,] tempFieldTypes = new char[height, width];
         List<Vector2Int> availables = new List<Vector2Int>();
@@ -390,7 +396,7 @@ public class MapDataGenerator
 
         // 후보지 탐색
         List<Vector2Int> candidates = new List<Vector2Int>();
-        int maxCandidateCount = amount * 10;
+        int maxCandidateCount = amount * 4;
 
         foreach (Vector2Int anchor in availables)
         {
@@ -451,6 +457,90 @@ public class MapDataGenerator
         this.houses = houses;
     }
 
+    private void GenerateSquareData()
+    {
+        StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
+        if (config == null)
+        {
+            Debug.LogWarning("StructureConfig not found at Resources/Data/StructureConfig.");
+            return;
+        }
+
+        StructureConfig.Info info = config.structures[2];
+        Vector2Int tileSize = info.size;
+
+        List<Vector2Int> availables = new List<Vector2Int>();
+        for (int row = 0; row < height; row++)
+        {
+            for (int col = 0; col < width; col++)
+            {
+                if (nodes[row, col].type == 'A') availables.Add(new Vector2Int(col, row));
+            }
+        }
+
+        Utils.Shuffle<Vector2Int>(availables);
+
+        List<Vector2Int> candidates = new List<Vector2Int>();
+        int maxCandidateCount = 10;
+
+        foreach (Vector2Int anchor in availables)
+        {
+            if (candidates.Count >= maxCandidateCount) break;
+
+            bool canPlace = true;
+            for (int row = anchor.y; (row < anchor.y + tileSize.y) && canPlace; row++)
+            {
+                for (int col = anchor.x; (col < anchor.x + tileSize.x) && canPlace; col++)
+                {
+                    if (row < 0 || col < 0 || row >= height || col >= width) canPlace = false;
+                    if (canPlace && nodes[row, col].type != 'A') canPlace = false;
+                }
+            }
+
+            if (!canPlace) continue;
+
+            candidates.Add(anchor);
+        }
+
+        Vector2Int squareAnchor = candidates[0];
+        float bestMinDist = float.MinValue;
+
+        foreach (Vector2Int anchor in candidates)
+        {
+            Vector2Int squareOrigin = anchor + info.origin;
+
+            float minDist = float.MaxValue;
+            foreach (House house in houses)
+            {
+                float tempDist = Vector2Int.Distance(squareOrigin, house.origin);
+                if (tempDist < minDist) minDist = tempDist;
+            }
+
+            if (minDist > bestMinDist)
+            {
+                squareAnchor = anchor;
+                bestMinDist = minDist;
+            }
+        }
+
+        for (int row = squareAnchor.y; row < squareAnchor.y + tileSize.y; row++)
+        {
+            for (int col = squareAnchor.x; col < squareAnchor.x + tileSize.x; col++)
+            {
+                nodes[row, col].type = 'S';
+            }
+        }
+
+        Square square = new Square
+        {
+            assetType = info.assetName,
+            origin = squareAnchor + info.origin,
+            tileSize = tileSize
+        };
+
+        this.sqaure = square;
+    }
+
     private MapData BuildMapData()
     {
         MapData mapData = new MapData
@@ -459,7 +549,8 @@ public class MapDataGenerator
             values = new float[height, width],
             fieldTypes = new char[height, width],
             areaID = new int[height, width],
-            houses = houses ?? new List<House>()
+            houses = houses ?? new List<House>(),
+            square = sqaure
         };
 
         for (int row = 0; row < height; row++)

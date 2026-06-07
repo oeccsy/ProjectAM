@@ -1,8 +1,7 @@
 using UnityEngine;
 
-public class House : MonoBehaviour
+public class Square : MonoBehaviour
 {
-    public string owner;
     public string assetType;
     public Vector2Int origin;
     public Vector2Int tileSize;
