@@ -34,5 +34,10 @@ public class SimulationScene : MonoBehaviour
 
         MapGenerator mapGenerator = new MapGenerator();
         mapGenerator.GenerateMap(mapData);
+
+        MapDataStore.Instance.MapData = mapData;
+        MapDataStore.Instance.Terrain = mapGenerator.Terrain;
+        MapDataStore.Instance.Houses = mapGenerator.Houses;
+        MapDataStore.Instance.Square = mapGenerator.Square;
     }
 }

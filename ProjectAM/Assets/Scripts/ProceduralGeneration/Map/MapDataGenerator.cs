@@ -16,8 +16,8 @@ public class MapDataGenerator
     private int areaCount;
 
     [Header("Structure")]
-    private List<House> houses;
-    private Square sqaure;
+    private List<Vector2Int> houseOrigins;
+    private Vector2Int squareOrigin;
 
     [Header("Result")]
     public MapData MapData { get; private set; }
@@ -369,7 +369,7 @@ public class MapDataGenerator
 
     private void GenerateHouseData(int amount)
     {
-        List<House> houses = new List<House>();
+        List<Vector2Int> houseOrigins = new List<Vector2Int>();
 
         StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
         if (config == null)
@@ -378,8 +378,8 @@ public class MapDataGenerator
             return;
         }
 
-        StructureConfig.Info info = config.structures[0];
-        Vector2Int tileSize = info.size;
+        StructureConfig.Entry houseInfo = config.structures[0];
+        Vector2Int houseSize = houseInfo.size;
 
         char[,] tempFieldTypes = new char[height, width];
         List<Vector2Int> availables = new List<Vector2Int>();
@@ -403,9 +403,9 @@ public class MapDataGenerator
             if (candidates.Count >= maxCandidateCount) break;
 
             bool canPlace = true;
-            for (int row = anchor.y; (row < anchor.y + tileSize.y) && canPlace; row++)
+            for (int row = anchor.y; (row < anchor.y + houseSize.y) && canPlace; row++)
             {
-                for (int col = anchor.x; (col < anchor.x + tileSize.x) && canPlace; col++)
+                for (int col = anchor.x; (col < anchor.x + houseSize.x) && canPlace; col++)
                 {
                     if (row < 0 || col < 0 || row >= height || col >= width) canPlace = false;
                     if (canPlace && tempFieldTypes[row, col] != 'A') canPlace = false;
@@ -414,9 +414,9 @@ public class MapDataGenerator
 
             if(!canPlace) continue;
 
-            for (int row = anchor.y; row < anchor.y + tileSize.y; row++)
+            for (int row = anchor.y; row < anchor.y + houseSize.y; row++)
             {
-                for (int col = anchor.x; col < anchor.x + tileSize.x; col++)
+                for (int col = anchor.x; col < anchor.x + houseSize.x; col++)
                 {
                     tempFieldTypes[row, col] = 'H';
                 }
@@ -435,26 +435,18 @@ public class MapDataGenerator
         // 남은 후보들을 실제 배치
         foreach (Vector2Int anchor in candidates)
         {
-            for (int row = anchor.y; row < anchor.y + tileSize.y; row++)
+            for (int row = anchor.y; row < anchor.y + houseSize.y; row++)
             {
-                for (int col = anchor.x; col < anchor.x + tileSize.x; col++)
+                for (int col = anchor.x; col < anchor.x + houseSize.x; col++)
                 {
                     nodes[row, col].type = 'H';
                 }
             }
 
-            House newHouse = new House
-            {
-                owner = "",
-                assetType = info.assetName,
-                origin = anchor + info.origin,
-                tileSize = tileSize
-            };
-
-            houses.Add(newHouse);
+            houseOrigins.Add(anchor + houseInfo.origin);
         }
 
-        this.houses = houses;
+        this.houseOrigins = houseOrigins;
     }
 
     private void GenerateSquareData()
@@ -466,8 +458,8 @@ public class MapDataGenerator
             return;
         }
 
-        StructureConfig.Info info = config.structures[2];
-        Vector2Int tileSize = info.size;
+        StructureConfig.Entry squareInfo = config.structures[2];
+        Vector2Int squareSize = squareInfo.size;
 
         List<Vector2Int> availables = new List<Vector2Int>();
         for (int row = 0; row < height; row++)
@@ -488,9 +480,9 @@ public class MapDataGenerator
             if (candidates.Count >= maxCandidateCount) break;
 
             bool canPlace = true;
-            for (int row = anchor.y; (row < anchor.y + tileSize.y) && canPlace; row++)
+            for (int row = anchor.y; (row < anchor.y + squareSize.y) && canPlace; row++)
             {
-                for (int col = anchor.x; (col < anchor.x + tileSize.x) && canPlace; col++)
+                for (int col = anchor.x; (col < anchor.x + squareSize.x) && canPlace; col++)
                 {
                     if (row < 0 || col < 0 || row >= height || col >= width) canPlace = false;
                     if (canPlace && nodes[row, col].type != 'A') canPlace = false;
@@ -507,12 +499,12 @@ public class MapDataGenerator
 
         foreach (Vector2Int anchor in candidates)
         {
-            Vector2Int squareOrigin = anchor + info.origin;
+            Vector2Int squareOrigin = anchor + squareInfo.origin;
 
             float minDist = float.MaxValue;
-            foreach (House house in houses)
+            foreach (Vector2Int houseOrigin in houseOrigins)
             {
-                float tempDist = Vector2Int.Distance(squareOrigin, house.origin);
+                float tempDist = Vector2Int.Distance(squareOrigin, houseOrigin);
                 if (tempDist < minDist) minDist = tempDist;
             }
 
@@ -523,22 +515,15 @@ public class MapDataGenerator
             }
         }
 
-        for (int row = squareAnchor.y; row < squareAnchor.y + tileSize.y; row++)
+        for (int row = squareAnchor.y; row < squareAnchor.y + squareSize.y; row++)
         {
-            for (int col = squareAnchor.x; col < squareAnchor.x + tileSize.x; col++)
+            for (int col = squareAnchor.x; col < squareAnchor.x + squareSize.x; col++)
             {
                 nodes[row, col].type = 'S';
             }
         }
 
-        Square square = new Square
-        {
-            assetType = info.assetName,
-            origin = squareAnchor + info.origin,
-            tileSize = tileSize
-        };
-
-        this.sqaure = square;
+        this.squareOrigin = squareAnchor + squareInfo.origin;
     }
 
     private MapData BuildMapData()
@@ -549,8 +534,8 @@ public class MapDataGenerator
             values = new float[height, width],
             fieldTypes = new char[height, width],
             areaID = new int[height, width],
-            houses = houses ?? new List<House>(),
-            square = sqaure
+            houseOrigins = houseOrigins,
+            squareOrigin = squareOrigin
         };
 
         for (int row = 0; row < height; row++)

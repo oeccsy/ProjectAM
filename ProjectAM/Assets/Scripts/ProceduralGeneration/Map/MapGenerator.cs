@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class MapGenerator
@@ -9,6 +10,14 @@ public class MapGenerator
     [SerializeField]
     private float bottomHeight = 0.0f;
 
+    private GameObject terrain;
+    private List<House> houses;
+    private Square square;
+
+    public GameObject Terrain => terrain;
+    public List<House> Houses => houses;
+    public Square Square => square;
+
     public void GenerateMap(MapData mapData)
     {
         GenerateTerrain(mapData);
@@ -19,17 +28,17 @@ public class MapGenerator
 
     private void GenerateTerrain(MapData mapData)
     {
-        GameObject terrainObject = new GameObject("Marching Squares Terrain");
-        MarchingSquaresTerrain terrainE = terrainObject.AddComponent<MarchingSquaresTerrain>();
-        terrainE.Build(mapData);
+        terrain = new GameObject("Marching Squares Terrain");
+        MarchingSquaresTerrain terrainComp = terrain.AddComponent<MarchingSquaresTerrain>();
+        terrainComp.Build(mapData);
 
-        MapGridDebugRenderer gridDebug = terrainObject.AddComponent<MapGridDebugRenderer>();
+        MapGridDebugRenderer gridDebug = terrain.AddComponent<MapGridDebugRenderer>();
         gridDebug.BindMapData(mapData);
     }
 
     private void GenerateBridges(MapData mapData)
     {
-        if (mapData.houses == null) return;
+        if (mapData.houseOrigins == null) return;
 
         GameObject container = new GameObject("Bridges");
 
@@ -56,11 +65,19 @@ public class MapGenerator
 
     private void GenerateHouses(MapData mapData)
     {
-        if (mapData.houses == null || mapData.houses.Count == 0) return;
+        if (mapData.houseOrigins == null || mapData.houseOrigins.Count == 0) return;
 
+        StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
+        if (config == null)
+        {
+            Debug.LogWarning("StructureConfig not found at Resources/Data/StructureConfig.");
+            return;
+        }
+
+        StructureConfig.Entry houseInfo = config.structures[0];
         GameObject container = new GameObject("Houses");
 
-        foreach (House house in mapData.houses)
+        foreach (Vector2Int houseOrigin in mapData.houseOrigins)
         {
             GameObject prefab = Resources.Load<GameObject>("Prefabs/House");
             if (prefab == null)
@@ -69,20 +86,25 @@ public class MapGenerator
                 continue;
             }
 
-            float worldX = house.origin.x * tileSize;
-            float worldZ = house.origin.y * tileSize;
+            float worldX = houseOrigin.x * tileSize;
+            float worldZ = houseOrigin.y * tileSize;
             Vector3 worldPos = new Vector3(worldX, topHeight, -worldZ);
 
             Quaternion rotation = Quaternion.Euler(0f, 90f * Random.Range(0, 4), 0f);
-            Object.Instantiate(prefab, worldPos, rotation, container.transform);
+            GameObject newObject = Object.Instantiate(prefab, worldPos, rotation, container.transform);
+            House newHouse = newObject.GetComponent<House>();
+            newHouse.size = houseInfo.size;
+            newHouse.origin = houseOrigin;
+            newHouse.entrance = houseInfo.entrances[0];
+
+            houses.Add(newHouse);
         }
     }
 
     private void GenerateSquare(MapData mapData)
     {
-        if (mapData.houses == null) return;
+        if (mapData.squareOrigin == null) return;
 
-        Square square = mapData.square;
         GameObject prefab = Resources.Load<GameObject>("Prefabs/Square");
         if (prefab == null)
         {
@@ -90,10 +112,11 @@ public class MapGenerator
             return;
         }
 
-        float worldX = square.origin.x * tileSize;
-        float worldZ = square.origin.y * tileSize;
+        float worldX = mapData.squareOrigin.x * tileSize;
+        float worldZ = mapData.squareOrigin.y * tileSize;
         Vector3 worldPos = new Vector3(worldX, topHeight, -worldZ);
 
-        Object.Instantiate(prefab, worldPos, Quaternion.identity);
+        GameObject newObject = Object.Instantiate(prefab, worldPos, Quaternion.identity);
+        square = newObject.GetComponent<Square>();
     }
 }
