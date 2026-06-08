@@ -32,12 +32,23 @@ public class SimulationScene : MonoBehaviour
         MapData mapData = mapDataGenerator.GenerateMapData(cellularAutomata);
         mapDataGenerator.PrintMapData();
 
-        MapGenerator mapGenerator = new MapGenerator();
-        mapGenerator.GenerateMap(mapData);
+        TerrainScaleSettings terrainScaleSettings = new TerrainScaleSettings
+        {
+            tileSize = 1.0f,
+            topHeight = 1.0f,
+            bottomHeight = 0.0f
+        };
 
-        MapDataStore.Instance.MapData = mapData;
-        MapDataStore.Instance.Terrain = mapGenerator.Terrain;
-        MapDataStore.Instance.Houses = mapGenerator.Houses;
-        MapDataStore.Instance.Square = mapGenerator.Square;
+        MapGenerator mapGenerator = new MapGenerator();
+        mapGenerator.GenerateMap(mapData, terrainScaleSettings);
+
+        WorldDataStore.Instance.MapData = mapData;
+        WorldDataStore.Instance.TerrainScaleSettings = terrainScaleSettings;
+        WorldDataStore.Instance.Terrain = mapGenerator.Terrain;
+        WorldDataStore.Instance.Houses = mapGenerator.Houses;
+        WorldDataStore.Instance.Square = mapGenerator.Square;
+
+        NPCSpawner npcSpawner = new NPCSpawner();
+        npcSpawner.Spawn(6);
     }
 }
