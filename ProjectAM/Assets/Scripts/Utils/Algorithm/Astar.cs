@@ -21,7 +21,7 @@ public class Astar
 
     private readonly PriorityQueue<AstarNode> openNodes = new PriorityQueue<AstarNode>(Comparer<AstarNode>.Create((a, b) => a.fCost.CompareTo(b.fCost)));
     private readonly Queue<AstarNode> closedNodes = new Queue<AstarNode>();
-    private readonly List<AstarNode> path = new List<AstarNode>();
+    private readonly List<Vector2Int> path = new List<Vector2Int>();
 
     private AstarNode start;
     private AstarNode goal;
@@ -50,7 +50,7 @@ public class Astar
         }
     }
 
-    public List<AstarNode> Path => path;
+    public List<Vector2Int> Path => path;
 
     public void FindPath(Vector2Int startPos, Vector2Int goalPos)
     {
@@ -160,7 +160,8 @@ public class Astar
 
         while (pathStack.Count > 0)
         {
-            path.Add(pathStack.Pop());
+            AstarNode pathNode = pathStack.Pop();
+            path.Add(new Vector2Int(pathNode.col, pathNode.row));
         }
     }
 }
