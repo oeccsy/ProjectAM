@@ -42,11 +42,12 @@ public class SimulationScene : MonoBehaviour
         MapGenerator mapGenerator = new MapGenerator();
         mapGenerator.GenerateMap(mapData, terrainScaleSettings);
 
-        WorldDataStore.Instance.MapData = mapData;
-        WorldDataStore.Instance.TerrainScaleSettings = terrainScaleSettings;
-        WorldDataStore.Instance.Terrain = mapGenerator.Terrain;
-        WorldDataStore.Instance.Houses = mapGenerator.Houses;
-        WorldDataStore.Instance.Square = mapGenerator.Square;
+        World.Instance.MapRuntime = new MapRuntime();
+        World.Instance.MapData = mapData;
+        World.Instance.TerrainScaleSettings = terrainScaleSettings;
+        World.Instance.Terrain = mapGenerator.Terrain;
+        World.Instance.Houses = mapGenerator.Houses;
+        World.Instance.Square = mapGenerator.Square;
 
         NPCSpawner npcSpawner = new NPCSpawner();
         npcSpawner.Spawn(6);

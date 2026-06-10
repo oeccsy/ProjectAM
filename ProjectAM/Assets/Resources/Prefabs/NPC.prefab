@@ -773,6 +773,7 @@ GameObject:
   - component: {fileID: 2067038324074929043}
   - component: {fileID: 3735871334507586540}
   - component: {fileID: 9207882348435620675}
+  - component: {fileID: 2415495268330537380}
   m_Layer: 0
   m_Name: NPC
   m_TagString: Untagged
@@ -859,6 +860,23 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 6551194897314973077}
+--- !u!114 &2415495268330537380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e69723e9f8ad649bf8b66bc81116bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcPathDebugRenderer
+  tileColor: {r: 0, g: 1, b: 1, a: 0.35}
+  lineColor: {r: 0, g: 1, b: 1, a: 1}
+  destColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  tileScale: 0.85
+  heightOffset: 0.05
 --- !u!1 &6834744841207863243
 GameObject:
   m_ObjectHideFlags: 0

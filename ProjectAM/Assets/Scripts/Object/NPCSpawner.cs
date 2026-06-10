@@ -5,8 +5,8 @@ public class NPCSpawner
 {
     public void Spawn(int amount)
     {
-        MapData mapData = WorldDataStore.Instance.MapData;
-        TerrainScaleSettings scaleConfig = WorldDataStore.Instance.TerrainScaleSettings;
+        MapData mapData = World.Instance.MapData;
+        TerrainScaleSettings scaleConfig = World.Instance.TerrainScaleSettings;
 
         GameObject prefab = Resources.Load<GameObject>("Prefabs/NPC");
         if (prefab == null)
@@ -18,7 +18,7 @@ public class NPCSpawner
         int height = mapData.resolution.y;
         int width = mapData.resolution.x;
 
-        Vector2Int squareOrigin = WorldDataStore.Instance.Square.origin;
+        Vector2Int squareOrigin = World.Instance.Square.origin;
         List<Vector2Int> spawnable = new List<Vector2Int>();
         
         for (int row = 0; row < height; row++)

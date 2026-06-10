@@ -1,8 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WorldDataStore : Singleton<WorldDataStore>
+public class World : Singleton<World>
 {
+    public MapRuntime MapRuntime { get; set; }
     public MapData MapData { get; set; }
     public TerrainScaleSettings TerrainScaleSettings { get; set; }
 
