@@ -773,6 +773,7 @@ GameObject:
   - component: {fileID: 2067038324074929043}
   - component: {fileID: 3735871334507586540}
   - component: {fileID: 9207882348435620675}
+  - component: {fileID: 7494498340023430655}
   - component: {fileID: 2415495268330537380}
   m_Layer: 0
   m_Name: NPC
@@ -860,6 +861,18 @@ MonoBehaviour:
           m_Value1: 0
         Name: Self
         m_Value: {fileID: 6551194897314973077}
+--- !u!114 &7494498340023430655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: daf2b33268bdd934b8ded8ccb5e66492, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Movement
 --- !u!114 &2415495268330537380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -873,9 +886,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcPathDebugRenderer
   tileColor: {r: 0, g: 1, b: 1, a: 0.35}
-  lineColor: {r: 0, g: 1, b: 1, a: 1}
   destColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  tileScale: 0.85
+  lineColor: {r: 0, g: 1, b: 1, a: 1}
+  debugTileScale: 0.85
   heightOffset: 0.05
 --- !u!1 &6834744841207863243
 GameObject:

@@ -11,73 +11,62 @@ public partial class WalkAroundAction : Action
 {
     [SerializeReference] public BlackboardVariable<NPC> Agent;
 
-    private NPC npc;
-    private Astar astar;
-    private List<Vector2Int> candidates = new List<Vector2Int>();
-    private List<Vector2Int> path;
-    
+    private const int DestRadius = 8;
 
-#if UNITY_EDITOR
-    private NpcPathDebugRenderer pathDebug;
-#endif
+    private Movement movement;
+    private Vector2Int destTile;
+    private readonly List<Vector2Int> candidates = new List<Vector2Int>();
 
     protected override Status OnStart()
     {
-        npc = Agent?.Value;
+        NPC npc = Agent?.Value;
         if (npc == null) return Status.Failure;
+
+        movement = npc.Movement;
+        if (movement == null) return Status.Failure;
 
         MapData mapData = World.Instance.MapData;
         if (mapData == null) return Status.Failure;
 
-        Vector2Int destTile = SelectDestination(npc.CurrentTile, mapData);
+        destTile = SelectDestination(npc.CurrentTile, mapData);
         if (destTile == npc.CurrentTile) return Status.Failure;
 
-        if (astar == null) astar = new Astar(mapData.fieldTypes, NPC.MovableTypes, Astar.HeuristicType.Manhattan);
-        astar.FindPath(npc.CurrentTile, destTile);
-        path = astar.Path;
-
-        if (path.Count <= 1) return Status.Failure;
-        npc.MoveAlong(path);
-
-#if UNITY_EDITOR
-        if (pathDebug == null) pathDebug = npc.GetComponent<NpcPathDebugRenderer>();
-        if (pathDebug != null) pathDebug.RegisterPath(path);
-#endif
+        movement.StartMoveTo(destTile);
+        if (movement.State == MoveState.Idle) return Status.Failure;
 
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
-        if (npc == null) return Status.Failure;
+        if (movement.State != MoveState.Idle) return Status.Running;
 
-        return (npc.State == NpcState.Walking) ? Status.Running : Status.Success;
+        return (movement.CurrentTile == destTile) ? Status.Success : Status.Failure;
     }
 
-    protected override void OnEnd()
-    {
-        NPC npc = Agent?.Value;
-        if (npc != null) npc.StopMove();
-
-#if UNITY_EDITOR
-        if (pathDebug != null) pathDebug.ClearPath();
-#endif
-    }
+    protected override void OnEnd() { }
 
     private Vector2Int SelectDestination(Vector2Int origin, MapData mapData)
     {
         candidates.Clear();
+        
         int width = mapData.resolution.x;
         int height = mapData.resolution.y;
 
-        for (int row = 0; row < height; row++)
+        for (int row = origin.y - DestRadius; row <= origin.y + DestRadius; row++)
         {
-            for (int col = 0; col < width; col++)
+            for (int col = origin.x - DestRadius; col <= origin.x + DestRadius; col++)
             {
-                if(row == origin.y && col == origin.x) continue;
-                if (!NPC.MovableTypes.Contains(mapData.fieldTypes[row, col])) continue;
+                if (row < 0 || col < 0 || row >= height || col >= width) continue;
+                if (Mathf.Abs(row - origin.y) + Mathf.Abs(col - origin.x) > DestRadius) continue;
+                if (!Movement.MovableTypes.Contains(mapData.fieldTypes[row, col])) continue;
+                
+                Vector2Int tile = new Vector2Int(col, row);
+                
+                if (!World.Instance.MapRuntime.IsEmpty(tile)) continue;
+                if (tile == origin) continue;
 
-                candidates.Add(new Vector2Int(col, row));
+                candidates.Add(tile);
             }
         }
 

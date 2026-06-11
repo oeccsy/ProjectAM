@@ -42,7 +42,7 @@ public class SimulationScene : MonoBehaviour
         MapGenerator mapGenerator = new MapGenerator();
         mapGenerator.GenerateMap(mapData, terrainScaleSettings);
 
-        World.Instance.MapRuntime = new MapRuntime();
+        World.Instance.MapRuntime = new MapRuntime(mapData.resolution);
         World.Instance.MapData = mapData;
         World.Instance.TerrainScaleSettings = terrainScaleSettings;
         World.Instance.Terrain = mapGenerator.Terrain;
