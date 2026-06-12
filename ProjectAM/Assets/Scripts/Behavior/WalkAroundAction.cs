@@ -12,10 +12,12 @@ public partial class WalkAroundAction : Action
     [SerializeReference] public BlackboardVariable<NPC> Agent;
 
     private const int DestRadius = 8;
+    private const float MaxWaitTime = 3.0f;
 
     private Movement movement;
     private Vector2Int destTile;
     private readonly List<Vector2Int> candidates = new List<Vector2Int>();
+    private float waitTime = 0.0f;
 
     protected override Status OnStart()
     {
@@ -34,12 +36,31 @@ public partial class WalkAroundAction : Action
         movement.StartMoveTo(destTile);
         if (movement.State == MoveState.Idle) return Status.Failure;
 
+        waitTime = 0.0f;
+
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
-        if (movement.State != MoveState.Idle) return Status.Running;
+        if (movement.State == MoveState.Moving)
+        {
+            waitTime = 0.0f;
+            return Status.Running;
+        }
+        if (movement.State == MoveState.Waiting)
+        {
+            waitTime += Time.deltaTime;
+            if (waitTime >= MaxWaitTime)
+            {
+                movement.Finish();
+                return Status.Failure;
+            }
+            else
+            {
+                return Status.Running;                
+            }
+        }
 
         return (movement.CurrentTile == destTile) ? Status.Success : Status.Failure;
     }

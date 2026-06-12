@@ -8,17 +8,15 @@ public class Movement : MonoBehaviour
     private const float MoveSpeed = 1.0f;
     private const float RotationSpeed = 270f;
     private const float ArriveThreshold = 0.02f;
-    private const float MaxWaitTime = 3.0f;
 
     private IMovable owner;
     private MoveState moveState = MoveState.Idle;
 
     private Astar astar;
     private List<Vector2Int> path;
+    private int pathIndex;
     private Vector2Int curTile;
     private Vector2Int nextTile;
-    private int pathIndex;
-    private float waitTime;
 
     public MoveState State => moveState;
     public Vector2Int CurrentTile => curTile;
@@ -63,16 +61,7 @@ public class Movement : MonoBehaviour
         if (pathDebug != null) pathDebug.RegisterPath(path);
 #endif
 
-        if (IsMovable(nextTile))
-        {
-            moveState = MoveState.Moving;
-            World.Instance.MapRuntime.Occupy(owner, nextTile);
-        }
-        else
-        {
-            moveState = MoveState.Waiting;
-            waitTime = 0.0f;
-        }
+        moveState = MoveState.Waiting;
     }
 
     private void WaitUntilMovable()
@@ -84,8 +73,7 @@ public class Movement : MonoBehaviour
         }
         else
         {
-            waitTime += Time.deltaTime;
-            if (waitTime >= MaxWaitTime) Finish();
+            moveState = MoveState.Waiting;
         }
     }
 
@@ -130,16 +118,7 @@ public class Movement : MonoBehaviour
             }
 
             nextTile = path[pathIndex];
-            if(IsMovable(nextTile))
-            {
-                moveState = MoveState.Moving;
-                World.Instance.MapRuntime.Occupy(owner, nextTile);
-            }
-            else
-            {
-                moveState = MoveState.Waiting;
-                waitTime = 0.0f;
-            }
+            moveState = MoveState.Waiting;
         }
     }
 
@@ -156,7 +135,7 @@ public class Movement : MonoBehaviour
         return true;
     }
 
-    private void Finish()
+    public void Finish()
     {
         moveState = MoveState.Idle;
 
