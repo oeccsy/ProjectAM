@@ -1,0 +1,104 @@
+using Unity.Cinemachine;
+using Unity.Cinemachine.TargetTracking;
+using UnityEngine;
+
+// Cinemachine을 이용해 NPC를 관찰하는 독립 클래스.
+public class Observer : MonoBehaviour
+{
+    private const float ChangeInterval = 15f;
+
+    [SerializeField]
+    private CinemachineCamera observerCamera;
+
+    [SerializeField]
+    private Vector3 viewOffset;
+    [SerializeField]
+    private float followDamping;
+    [SerializeField]
+    private Vector2 aimDamping;
+    [SerializeField]
+    private Vector2 screenPosition = new Vector2(0f, 0.2f);
+
+    private CinemachineFollow follow;
+    private CinemachineRotationComposer composer;
+    private NPC currentTarget;
+    private float timer;
+
+    private void Start()
+    {
+        EnsureCamera();
+        EnsureBrain();
+        ChangeTarget();
+    }
+
+    private void Update()
+    {
+        ApplyParameters();
+
+        timer += Time.deltaTime;
+        if (timer >= ChangeInterval)
+        {
+            timer = 0f;
+            ChangeTarget();
+        }
+    }
+
+    // CinemachineCamera와 위치 추적 컴포넌트를 보장한다.
+    private void EnsureCamera()
+    {
+        if (observerCamera == null)
+        {
+            GameObject cameraObject = new GameObject("ObserverCamera");
+            cameraObject.transform.SetParent(transform, false);
+            observerCamera = cameraObject.AddComponent<CinemachineCamera>();
+        }
+
+        follow = observerCamera.GetComponent<CinemachineFollow>();
+        if (follow == null) follow = observerCamera.gameObject.AddComponent<CinemachineFollow>();
+        follow.TrackerSettings.BindingMode = BindingMode.WorldSpace;
+
+        composer = observerCamera.GetComponent<CinemachineRotationComposer>();
+        if (composer == null) composer = observerCamera.gameObject.AddComponent<CinemachineRotationComposer>();
+    }
+
+    private void EnsureBrain()
+    {
+        Camera renderCamera = Camera.main;
+        if (renderCamera == null) renderCamera = FindFirstObjectByType<Camera>();
+        if (renderCamera == null) return;
+
+        if (renderCamera.GetComponent<CinemachineBrain>() == null)
+        {
+            renderCamera.gameObject.AddComponent<CinemachineBrain>();
+        }
+    }
+
+    // 인스펙터에서 실시간으로 조정할 수 있도록 매 프레임 파라미터 적용
+    private void ApplyParameters()
+    {
+        follow.FollowOffset = viewOffset;
+        follow.TrackerSettings.PositionDamping = Vector3.one * followDamping;
+        composer.Damping = aimDamping;
+        composer.Composition.ScreenPosition = screenPosition;
+    }
+
+    // 무작위로 관찰 대상 지정
+    private void ChangeTarget()
+    {
+        NPC[] npcs = FindObjectsByType<NPC>(FindObjectsSortMode.None);
+        if (npcs.Length == 0) return;
+
+        NPC next = npcs[Random.Range(0, npcs.Length)];
+        if (npcs.Length > 1)
+        {
+            while (next == currentTarget)
+            {
+                next = npcs[Random.Range(0, npcs.Length)];
+            }
+        }
+
+        currentTarget = next;
+        observerCamera.Follow = currentTarget.transform;
+        observerCamera.LookAt = currentTarget.transform;
+    }
+}
