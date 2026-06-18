@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,6 +11,7 @@ public class Movement : MonoBehaviour
     private const float ArriveThreshold = 0.02f;
 
     private IMovable owner;
+    [field: SerializeField]
     private MoveState moveState = MoveState.Idle;
 
     private Astar astar;
@@ -61,7 +63,7 @@ public class Movement : MonoBehaviour
         if (pathDebug != null) pathDebug.RegisterPath(path);
 #endif
 
-        moveState = MoveState.Waiting;
+        WaitUntilMovable();
     }
 
     private void WaitUntilMovable()
@@ -118,7 +120,7 @@ public class Movement : MonoBehaviour
             }
 
             nextTile = path[pathIndex];
-            moveState = MoveState.Waiting;
+            WaitUntilMovable();
         }
     }
 
