@@ -11,6 +11,7 @@ public class Movement : MonoBehaviour
     private const float ArriveThreshold = 0.02f;
 
     private IMovable owner;
+    private Rigidbody rigidbody;
     [field: SerializeField]
     private MoveState moveState = MoveState.Idle;
 
@@ -19,6 +20,7 @@ public class Movement : MonoBehaviour
     private int pathIndex;
     private Vector2Int curTile;
     private Vector2Int nextTile;
+
 
     public MoveState State => moveState;
     public Vector2Int CurrentTile => curTile;
@@ -30,6 +32,8 @@ public class Movement : MonoBehaviour
     private void Awake()
     {
         owner = GetComponent<IMovable>();
+        rigidbody = GetComponent<Rigidbody>();
+
         curTile = TileCoordinate.WorldToTile(transform.position);
         World.Instance.MapRuntime.TryOccupy(owner, curTile);
 
@@ -41,7 +45,7 @@ public class Movement : MonoBehaviour
 #endif
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (moveState == MoveState.Waiting) WaitUntilMovable();
         if (moveState == MoveState.Moving) FollowPath();
@@ -81,10 +85,11 @@ public class Movement : MonoBehaviour
 
     private void FollowPath()
     {
-        Vector3 destPos = TileCoordinate.TileToWorld(nextTile);
-
         Vector3 curPos = transform.position;
-        Vector3 nextPos = Vector3.MoveTowards(curPos, destPos, MoveSpeed * Time.deltaTime);
+        Vector3 destPos = TileCoordinate.TileToWorld(nextTile);
+        destPos.y = curPos.y;
+
+        Vector3 nextPos = Vector3.MoveTowards(curPos, destPos, MoveSpeed * Time.fixedDeltaTime);
         
         Vector3 dir = destPos - curPos;
         dir.y = 0f;
@@ -93,20 +98,21 @@ public class Movement : MonoBehaviour
         if (dir.sqrMagnitude > 0.0001f)
         {
             Quaternion look = Quaternion.LookRotation(dir);
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, look, RotationSpeed * Time.deltaTime);
+            rigidbody.rotation = Quaternion.RotateTowards(transform.rotation, look, RotationSpeed * Time.fixedDeltaTime);
+            
         }
 
         // 이동
         if (Vector3.Distance(nextPos, destPos) <= ArriveThreshold)
         {   
-            transform.position = destPos;
+            rigidbody.MovePosition(destPos);
             
             World.Instance.MapRuntime.Release(owner, curTile);
             curTile = nextTile;
         }
         else
         {
-            transform.position = nextPos;
+            rigidbody.MovePosition(nextPos);
         }
 
         // 목표지점 재설정

@@ -460,6 +460,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5578874821984673902}
   - component: {fileID: 3650973981790292986}
+  - component: {fileID: -5663674238600986083}
   m_Layer: 0
   m_Name: House
   m_TagString: Untagged
@@ -516,9 +517,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::House
   owner: 
-  assetType: 
   origin: {x: 0, y: 0}
-  tileSize: {x: 0, y: 0}
+  size: {x: 0, y: 0}
+  entrance: {x: 0, y: 0}
+--- !u!65 &-5663674238600986083
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 793318076261658912}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 3, y: 4, z: 3}
+  m_Center: {x: 0, y: 2, z: 0}
 --- !u!1 &2004904574334601315
 GameObject:
   m_ObjectHideFlags: 0
