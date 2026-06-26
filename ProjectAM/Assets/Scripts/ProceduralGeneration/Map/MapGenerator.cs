@@ -95,6 +95,18 @@ public class MapGenerator
 
             houses.Add(newHouse);
         }
+
+        List<NpcColor> npcColors = ColorUtils.GetNpcColorList();
+        if (npcColors.Count < houses.Count)
+        {
+            Debug.LogError($"Need More NpcColor");
+            return;
+        }
+
+        for (int i = 0; i < houses.Count; i++)
+        {
+            houses[i].owner = npcColors[i];
+        }
     }
 
     private void GenerateSquare(MapData mapData)

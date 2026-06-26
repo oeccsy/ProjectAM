@@ -36,7 +36,7 @@ public class MapDataGenerator
     {
         GenerateFieldData(cellularAutomata);
         GenerateBridgeData();
-        GenerateHouseData(6);
+        GenerateHouseData();
         GenerateSquareData();
 
         MapData = BuildMapData();
@@ -367,18 +367,27 @@ public class MapDataGenerator
         }
     }
 
-    private void GenerateHouseData(int amount)
+    private void GenerateHouseData()
     {
+        SimulationConfig simulationConfig = Resources.Load<SimulationConfig>("Data/SimulationConfig");
+        if (simulationConfig == null)
+        {
+            Debug.LogWarning("SimulationConfig not found at Resources/Data/SimulationConfig.");
+            return;
+        }
+
+        int amount = simulationConfig.npcCount;
+        
         List<Vector2Int> houseOrigins = new List<Vector2Int>();
 
-        StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
-        if (config == null)
+        StructureConfig structureConfig = Resources.Load<StructureConfig>("Data/StructureConfig");
+        if (structureConfig == null)
         {
             Debug.LogWarning("StructureConfig not found at Resources/Data/StructureConfig.");
             return;
         }
 
-        StructureConfig.Entry houseInfo = config.structures[0];
+        StructureConfig.Entry houseInfo = structureConfig.structures[0];
         Vector2Int houseSize = houseInfo.size;
 
         char[,] tempFieldTypes = new char[height, width];

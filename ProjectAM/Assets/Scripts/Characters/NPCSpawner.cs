@@ -35,6 +35,7 @@ public class NPCSpawner
 
         int spawnCount = Mathf.Min(amount, spawnable.Count);
         GameObject container = new GameObject("NPCs");
+        List<NpcColor> npcColors = ColorUtils.GetNpcColorList();
 
         for (int i = 0; i < spawnCount; i++)
         {
@@ -46,6 +47,10 @@ public class NPCSpawner
 
             GameObject instance = Object.Instantiate(prefab, worldPos, Quaternion.identity, container.transform);
             instance.name = prefab.name;
+
+            NPC npc = instance.GetComponent<NPC>();
+            npc.Init(npcColors[i]);
+            World.Instance.NPCs.Add(npc);
         }
     }
 }

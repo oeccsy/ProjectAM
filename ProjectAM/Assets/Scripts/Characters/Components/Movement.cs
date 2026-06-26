@@ -99,7 +99,6 @@ public class Movement : MonoBehaviour
         {
             Quaternion look = Quaternion.LookRotation(dir);
             rigidbody.rotation = Quaternion.RotateTowards(transform.rotation, look, RotationSpeed * Time.fixedDeltaTime);
-            
         }
 
         // 이동

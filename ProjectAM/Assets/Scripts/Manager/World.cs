@@ -10,4 +10,6 @@ public class World : Singleton<World>
     public GameObject Terrain { get; set; }
     public List<House> Houses { get; set; }
     public Square Square { get; set; }
+
+    public List<NPC> NPCs { get; set; }
 }

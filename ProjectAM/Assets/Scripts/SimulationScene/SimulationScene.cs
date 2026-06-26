@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class SimulationScene : MonoBehaviour
@@ -48,8 +49,17 @@ public class SimulationScene : MonoBehaviour
         World.Instance.Terrain = mapGenerator.Terrain;
         World.Instance.Houses = mapGenerator.Houses;
         World.Instance.Square = mapGenerator.Square;
+        World.Instance.NPCs = new List<NPC>();
+
+
+        SimulationConfig simulationConfig = Resources.Load<SimulationConfig>("Data/SimulationConfig");
+        if (simulationConfig == null)
+        {
+            Debug.LogWarning("SimulationConfig not found at Resources/Data/SimulationConfig.");
+            return;
+        }
 
         NPCSpawner npcSpawner = new NPCSpawner();
-        npcSpawner.Spawn(6);
+        npcSpawner.Spawn(simulationConfig.npcCount);
     }
 }
