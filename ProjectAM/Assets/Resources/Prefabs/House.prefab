@@ -516,10 +516,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b7dcd90b78985c4d92426b19602eaf9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::House
-  owner: 
+  owner: 8
   origin: {x: 0, y: 0}
   size: {x: 0, y: 0}
   entrance: {x: 0, y: 0}
+  guests: 
 --- !u!65 &-5663674238600986083
 BoxCollider:
   m_ObjectHideFlags: 0

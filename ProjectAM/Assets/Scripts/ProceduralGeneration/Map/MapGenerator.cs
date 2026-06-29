@@ -106,6 +106,7 @@ public class MapGenerator
         for (int i = 0; i < houses.Count; i++)
         {
             houses[i].owner = npcColors[i];
+            houses[i].ApplyRoofColor(npcColors[i]);
         }
     }
 

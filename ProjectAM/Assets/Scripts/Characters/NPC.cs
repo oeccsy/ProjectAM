@@ -1,3 +1,4 @@
+using Unity.AppUI.MVVM;
 using Unity.Behavior;
 using UnityEngine;
 
@@ -9,15 +10,18 @@ public class NPC : MonoBehaviour, IMovable
     private Animator animator;
     private BehaviorGraphAgent behaviorGraph;
     private Movement movement;
+    private Appearance appearance;
 
     public NpcColor OwnColor => ownColor;
     public Movement Movement => movement;
+    public Appearance Appearance => appearance;
     public Vector2Int CurrentTile => movement.CurrentTile;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         movement = GetComponent<Movement>();
+        appearance = GetComponent<Appearance>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
         behaviorGraph.SetVariableValue<NPC>("NPC", this);
@@ -32,5 +36,7 @@ public class NPC : MonoBehaviour, IMovable
     {
         if(ownColor != NpcColor.Count) return;
         ownColor = color;
+
+        appearance.ApplyColor(ownColor);
     }
 }

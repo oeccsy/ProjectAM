@@ -5,14 +5,14 @@ public static class ColorUtils
 {
     private static readonly Dictionary<NpcColor, Color> ColorTable = new Dictionary<NpcColor, Color>
     {
-        { NpcColor.Red,    GetColorFromHex("#E63946") },
-        { NpcColor.Blue,   GetColorFromHex("#457B9D") },
-        { NpcColor.Green,  GetColorFromHex("#2A9D8F") },
-        { NpcColor.Purple, GetColorFromHex("#7B2CBF") },
-        { NpcColor.Orange, GetColorFromHex("#F4A261") },
-        { NpcColor.Brown,  GetColorFromHex("#6F4E37") },
-        { NpcColor.White,  GetColorFromHex("#F1FAEE") },
-        { NpcColor.Yellow, GetColorFromHex("#E9C46A") },
+        { NpcColor.Red,    GetColorFromHex("#F4A3A3") },
+        { NpcColor.Blue,   GetColorFromHex("#A5C8E4") },
+        { NpcColor.Green,  GetColorFromHex("#A8D5B5") },
+        { NpcColor.Purple, GetColorFromHex("#C5B3E6") },
+        { NpcColor.Orange, GetColorFromHex("#F6C49A") },
+        { NpcColor.Brown,  GetColorFromHex("#C9A98C") },
+        { NpcColor.White,  GetColorFromHex("#EFEDE6") },
+        { NpcColor.Yellow, GetColorFromHex("#F7E1A0") },
     };
 
     public static Color GetColor(NpcColor color)
