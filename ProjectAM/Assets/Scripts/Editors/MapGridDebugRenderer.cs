@@ -64,7 +64,7 @@ public class MapGridDebugRenderer : MonoBehaviour
         {
             for (int col = 0; col < width; col++)
             {
-                if(mapData.fieldTypes[row, col] == 'H') DrawCellBorder(row, col);
+                if(mapData.fieldTypes[row, col] == 'H' || mapData.fieldTypes[row, col] == 'Y') DrawCellBorder(row, col);
             }
         }
 

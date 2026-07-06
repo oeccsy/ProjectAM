@@ -448,7 +448,8 @@ public class MapDataGenerator
             {
                 for (int col = anchor.x; col < anchor.x + houseSize.x; col++)
                 {
-                    nodes[row, col].type = 'H';
+                    bool isYard = row == anchor.y || col == anchor.x || row == anchor.y + houseSize.y - 1 || col == anchor.x + houseSize.x - 1;
+                    nodes[row, col].type = (isYard) ? 'Y' : 'H';
                 }
             }
 
