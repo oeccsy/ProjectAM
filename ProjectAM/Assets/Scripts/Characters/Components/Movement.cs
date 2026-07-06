@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
-    public static readonly HashSet<char> MovableTypes = new HashSet<char> { 'A', 'B', 'S' };
+    public static readonly HashSet<char> MovableTypes = new HashSet<char> { 'A', 'B', 'S', 'Y' };
 
     private const float MoveSpeed = 1.0f;
     private const float RotationSpeed = 270f;
@@ -38,7 +38,7 @@ public class Movement : MonoBehaviour
         World.Instance.MapRuntime.TryOccupy(owner, curTile);
 
         MapData mapData = World.Instance.MapData;
-        astar = new Astar(mapData.fieldTypes, MovableTypes, Astar.HeuristicType.Manhattan);
+        astar = new Astar(IsMovable, Astar.HeuristicType.Manhattan);
 
 #if UNITY_EDITOR
         pathDebug = GetComponent<NpcPathDebugRenderer>();

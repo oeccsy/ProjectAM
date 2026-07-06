@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,8 +16,7 @@ public class Astar
     private int width;
 
     private AstarNode[,] nodes;
-    private char[,] fieldTypes;
-    private HashSet<char> visitableTypes;
+    private Func<Vector2Int, bool> isMovable;
     private bool[,] isVisit;
 
     private readonly PriorityQueue<AstarNode> openNodes = new PriorityQueue<AstarNode>(Comparer<AstarNode>.Create((a, b) => a.fCost.CompareTo(b.fCost)));
@@ -29,14 +29,13 @@ public class Astar
     private readonly int[] dr = { 0, 0, 1, -1 };
     private readonly int[] dc = { 1, -1, 0, 0 };
 
-    public Astar(char[,] fieldTypes, HashSet<char> visitableTypes, HeuristicType heuristicType)
+    public Astar(Func<Vector2Int, bool> isMovable, HeuristicType heuristicType)
     {
+        this.isMovable = isMovable;
         this.heuristicType = heuristicType;
-        this.fieldTypes = fieldTypes;
-        this.visitableTypes = visitableTypes;
 
-        height = fieldTypes.GetLength(0);
-        width = fieldTypes.GetLength(1);
+        height = 512;
+        width = 512;
 
         nodes = new AstarNode[height, width];
         isVisit = new bool[height, width];
@@ -83,7 +82,7 @@ public class Astar
                 int nextCol = curNode.col + dc[i];
 
                 if (nextRow < 0 || nextRow >= height || nextCol < 0 || nextCol >= width) continue;
-                if (!visitableTypes.Contains(fieldTypes[nextRow, nextCol])) continue;
+                if (!isMovable(new Vector2Int(nextCol, nextRow))) continue;
 
                 AstarNode adjNode = nodes[nextRow, nextCol];
 
