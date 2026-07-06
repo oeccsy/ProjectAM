@@ -35,7 +35,9 @@ public class Movement : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
 
         curTile = TileCoordinate.WorldToTile(transform.position);
-        World.Instance.MapRuntime.TryOccupy(owner, curTile);
+
+        bool isEmpty = World.Instance.MapRuntime.IsEmpty(curTile);
+        if (isEmpty) World.Instance.MapRuntime.Reserve(owner, curTile);
 
         MapData mapData = World.Instance.MapData;
         astar = new Astar(IsMovable, Astar.HeuristicType.Manhattan);
@@ -75,7 +77,7 @@ public class Movement : MonoBehaviour
         if (IsMovable(nextTile))
         {
             moveState = MoveState.Moving;
-            World.Instance.MapRuntime.Occupy(owner, nextTile);
+            World.Instance.MapRuntime.Reserve(owner, nextTile);
         }
         else
         {
