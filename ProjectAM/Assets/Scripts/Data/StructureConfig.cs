@@ -9,9 +9,8 @@ public class StructureConfig : ScriptableObject
     public struct Entry
     {
         public string assetName;
-        public Vector2Int origin;
         public Vector2Int size;
-        public Vector2Int[] entrances;
+        public Vector2Int originOffset;
     }
 
     public Entry[] structures;

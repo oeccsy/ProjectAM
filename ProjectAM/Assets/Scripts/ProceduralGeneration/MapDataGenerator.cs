@@ -16,8 +16,8 @@ public class MapDataGenerator
     private int areaCount;
 
     [Header("Structure")]
-    private List<Vector2Int> houseOrigins;
-    private Vector2Int squareOrigin;
+    private List<Vector2Int> houseAnchors;
+    private Vector2Int squareAnchor;
 
     [Header("Result")]
     public MapData MapData { get; private set; }
@@ -378,7 +378,7 @@ public class MapDataGenerator
 
         int amount = simulationConfig.npcCount;
         
-        List<Vector2Int> houseOrigins = new List<Vector2Int>();
+        List<Vector2Int> houseAnchors = new List<Vector2Int>();
 
         StructureConfig structureConfig = Resources.Load<StructureConfig>("Data/StructureConfig");
         if (structureConfig == null)
@@ -453,10 +453,10 @@ public class MapDataGenerator
                 }
             }
 
-            houseOrigins.Add(anchor + houseInfo.origin);
+            houseAnchors.Add(anchor);
         }
 
-        this.houseOrigins = houseOrigins;
+        this.houseAnchors = houseAnchors;
     }
 
     private void GenerateSquareData()
@@ -468,6 +468,7 @@ public class MapDataGenerator
             return;
         }
 
+        StructureConfig.Entry houseInfo = config.structures[0];
         StructureConfig.Entry squareInfo = config.structures[2];
         Vector2Int squareSize = squareInfo.size;
 
@@ -509,11 +510,12 @@ public class MapDataGenerator
 
         foreach (Vector2Int anchor in candidates)
         {
-            Vector2Int squareOrigin = anchor + squareInfo.origin;
+            Vector2Int squareOrigin = anchor + squareInfo.originOffset;
 
             float minDist = float.MaxValue;
-            foreach (Vector2Int houseOrigin in houseOrigins)
+            foreach (Vector2Int houseAnchor in houseAnchors)
             {
+                Vector2Int houseOrigin = houseAnchor + houseInfo.originOffset;
                 float tempDist = Vector2Int.Distance(squareOrigin, houseOrigin);
                 if (tempDist < minDist) minDist = tempDist;
             }
@@ -533,7 +535,7 @@ public class MapDataGenerator
             }
         }
 
-        this.squareOrigin = squareAnchor + squareInfo.origin;
+        this.squareAnchor = squareAnchor;
     }
 
     private MapData BuildMapData()
@@ -544,8 +546,8 @@ public class MapDataGenerator
             values = new float[height, width],
             fieldTypes = new char[height, width],
             areaID = new int[height, width],
-            houseOrigins = houseOrigins,
-            squareOrigin = squareOrigin
+            houseAnchors = houseAnchors,
+            squareAnchor = squareAnchor
         };
 
         for (int row = 0; row < height; row++)
