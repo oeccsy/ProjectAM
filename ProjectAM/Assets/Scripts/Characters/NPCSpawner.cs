@@ -18,8 +18,8 @@ public class NPCSpawner
 
             NPC npc = instance.GetComponent<NPC>();
             npc.Init(npcColors[i]);
-            
-            World.Instance.NPCs.Add(npc);
+
+            World.Instance.NPCs.Register(npcColors[i], npc);
         }
     }
 

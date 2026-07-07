@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 public class SimulationScene : MonoBehaviour
@@ -43,14 +42,19 @@ public class SimulationScene : MonoBehaviour
         MapGenerator mapGenerator = new MapGenerator();
         mapGenerator.GenerateMap(mapData, terrainScaleSettings);
 
-        World.Instance.MapRuntime = new MapRuntime(mapData.resolution);
-        World.Instance.MapData = mapData;
-        World.Instance.TerrainScaleSettings = terrainScaleSettings;
-        World.Instance.Terrain = mapGenerator.Terrain;
-        World.Instance.Houses = mapGenerator.Houses;
-        World.Instance.Square = mapGenerator.Square;
-        World.Instance.NPCs = new List<NPC>();
+        World world = World.Instance;
+        world.MapData = mapData;
+        world.MapRuntime = new MapRuntime(mapData.resolution);
+        world.Terrain = mapGenerator.Terrain;
+        world.TerrainScaleSettings = terrainScaleSettings;
+        world.Houses = new Registry<House>();
+        world.Square = mapGenerator.Square;
+        world.NPCs = new Registry<NPC>();
 
+        foreach (House house in mapGenerator.Houses)
+        {
+            World.Instance.Houses.Register(house.owner, house);
+        }
 
         SimulationConfig simulationConfig = Resources.Load<SimulationConfig>("Data/SimulationConfig");
         if (simulationConfig == null)
