@@ -15,14 +15,10 @@ MonoBehaviour:
   structures:
   - assetName: Structures_Cabin_A_S_v01
     size: {x: 5, y: 5}
-    origin: {x: 2, y: 2}
-    entrances:
-    - {x: 0, y: 2}
+    originOffset: {x: 2, y: 2}
   - assetName: Structures_Cabin_B_M_v01
     size: {x: 7, y: 9}
-    origin: {x: 3, y: 3}
-    entrances: []
+    originOffset: {x: 3, y: 4}
   - assetName: structures_Plaza_Round_7x7_v02
     size: {x: 7, y: 7}
-    origin: {x: 3, y: 3}
-    entrances: []
+    originOffset: {x: 3, y: 3}

@@ -92,7 +92,6 @@ public class MapGenerator
             House newHouse = newObject.GetComponent<House>();
             newHouse.origin = houseOrigin;
             newHouse.size = houseInfo.size;
-            newHouse.entrance = houseInfo.entrances[0];
 
             houses.Add(newHouse);
         }
