@@ -1127,6 +1127,9 @@ GameObject:
   - component: {fileID: 7494498340023430655}
   - component: {fileID: 1418132974921234732}
   - component: {fileID: 2415495268330537380}
+  - component: {fileID: 3222979079247674636}
+  - component: {fileID: 7890931893333393568}
+  - component: {fileID: 1069954388702151773}
   - component: {fileID: -2863460901950167145}
   - component: {fileID: 8041132663924648177}
   m_Layer: 0
@@ -1261,6 +1264,44 @@ MonoBehaviour:
   lineColor: {r: 0, g: 1, b: 1, a: 1}
   debugTileScale: 0.85
   heightOffset: 0.05
+--- !u!114 &3222979079247674636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f25e62fcac907c4da0a5edb1088f0ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcAnimation
+  enterDuration: 1
+  enterSpins: 3
+--- !u!114 &7890931893333393568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a357e9ed430d7742925ad33af60927b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HouseEntry
+--- !u!114 &1069954388702151773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f353a368f9049f4fad154702ed21c9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoftHide
 --- !u!136 &-2863460901950167145
 CapsuleCollider:
   m_ObjectHideFlags: 0

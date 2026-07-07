@@ -90,6 +90,7 @@ public class MapGenerator
             Quaternion rotation = Quaternion.Euler(0f, 90f * Random.Range(0, 4), 0f);
             GameObject newObject = Object.Instantiate(prefab, worldPos, rotation, container.transform);
             House newHouse = newObject.GetComponent<House>();
+            newHouse.anchor = houseAnchor;
             newHouse.origin = houseOrigin;
             newHouse.size = houseInfo.size;
 

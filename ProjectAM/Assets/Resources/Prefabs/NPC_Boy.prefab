@@ -1291,7 +1291,10 @@ GameObject:
   - component: {fileID: 9207882348435620675}
   - component: {fileID: 7494498340023430655}
   - component: {fileID: -2619038051374759827}
+  - component: {fileID: 9049404288401243677}
+  - component: {fileID: 423592675224039361}
   - component: {fileID: 2415495268330537380}
+  - component: {fileID: 3450967119247405455}
   - component: {fileID: -2863460901950167145}
   - component: {fileID: 8041132663924648177}
   m_Layer: 0
@@ -1409,6 +1412,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba43fb9b9662e314d80093b3be52f31a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Appearance
+--- !u!114 &9049404288401243677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f25e62fcac907c4da0a5edb1088f0ce, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcAnimation
+  enterDuration: 1
+  enterSpins: 3
+--- !u!114 &423592675224039361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a357e9ed430d7742925ad33af60927b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HouseEntry
 --- !u!114 &2415495268330537380
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1426,6 +1455,18 @@ MonoBehaviour:
   lineColor: {r: 0, g: 1, b: 1, a: 1}
   debugTileScale: 0.85
   heightOffset: 0.05
+--- !u!114 &3450967119247405455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f353a368f9049f4fad154702ed21c9f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoftHide
 --- !u!136 &-2863460901950167145
 CapsuleCollider:
   m_ObjectHideFlags: 0
