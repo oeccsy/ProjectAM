@@ -108,3 +108,6 @@ InitTestScene*.unity*
 
 # Reference
 /Assets/Scripts/Reference
+
+# Plugins
+/[Aa]ssets/[Pp]lugins/
