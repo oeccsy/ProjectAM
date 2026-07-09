@@ -50,6 +50,7 @@ public class SimulationScene : MonoBehaviour
         world.Houses = new Registry<House>();
         world.Square = mapGenerator.Square;
         world.NPCs = new Registry<NPC>();
+        world.Time = new GameObject("TimeSystem").AddComponent<TimeSystem>();
 
         foreach (House house in mapGenerator.Houses)
         {
@@ -65,5 +66,9 @@ public class SimulationScene : MonoBehaviour
 
         NPCSpawner npcSpawner = new NPCSpawner();
         npcSpawner.Spawn(simulationConfig.npcCount);
+        
+        Light sun = GetComponentInChildren<Light>();
+        DayLight dayLight = new GameObject("DayLight").AddComponent<DayLight>();
+        dayLight.BindSun(sun);
     }
 }

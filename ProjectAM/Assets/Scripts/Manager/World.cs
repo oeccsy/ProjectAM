@@ -14,4 +14,7 @@ public class World : Singleton<World>
 
     // Npcs
     public Registry<NPC> NPCs { get; set; }
+
+    // Systems
+    public TimeSystem Time { get; set; }
 }
