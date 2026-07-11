@@ -37,6 +37,7 @@ public class MapGenerator
     private void GenerateBridges(MapData mapData)
     {
         GameObject container = new GameObject("Bridges");
+        container.transform.SetParent(terrain.transform);
 
         for(int row = 0; row < mapData.resolution.y; row++)
         {
@@ -72,6 +73,7 @@ public class MapGenerator
 
         StructureConfig.Entry houseInfo = config.structures[0];
         GameObject container = new GameObject("Houses");
+        container.transform.SetParent(terrain.transform);
 
         foreach (Vector2Int houseAnchor in mapData.houseAnchors)
         {
@@ -134,7 +136,7 @@ public class MapGenerator
         float worldZ = squareOrigin.y * terrainSizeData.tileSize;
         Vector3 worldPos = new Vector3(worldX, terrainSizeData.topHeight, -worldZ);
 
-        GameObject newObject = Object.Instantiate(prefab, worldPos, Quaternion.identity);
+        GameObject newObject = Object.Instantiate(prefab, worldPos, Quaternion.identity, terrain.transform);
         square = newObject.GetComponent<Square>();
         square.origin = squareOrigin;
         square.size = squareInfo.size;

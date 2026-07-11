@@ -3,15 +3,16 @@ using UnityEngine;
 
 public class NPCSpawner
 {
-    public void Spawn(int amount)
+    public void Spawn(int amount, Transform parent)
     {
         List<Vector3> spawnable = FindSpawnablePosition(amount);
         List<GameObject> prefabs = SelectRandomNpcPrefab(amount);
         List<NpcColor> npcColors = ColorUtils.GetNpcColorList();
-        
+
         int actualSpawnCount = Mathf.Min(amount, spawnable.Count);
         int culpritIndex = Random.Range(0, actualSpawnCount);
         GameObject container = new GameObject("NPCs");
+        container.transform.SetParent(parent);
 
         for (int i = 0; i < actualSpawnCount; i++)
         {

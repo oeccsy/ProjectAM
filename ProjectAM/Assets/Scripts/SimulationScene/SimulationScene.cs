@@ -54,6 +54,10 @@ public class SimulationScene : MonoBehaviour
         world.Time = new GameObject("TimeSystem").AddComponent<TimeSystem>();
         world.Contacts = new ContactLog();
 
+        // 판이 끝나면 씬 루트만 지우면 되도록 생성물을 이 오브젝트 아래로 모은다
+        world.Terrain.transform.SetParent(transform);
+        world.Time.transform.SetParent(transform);
+
         foreach (House house in mapGenerator.Houses)
         {
             World.Instance.Houses.Register(house.owner, house);
@@ -68,12 +72,13 @@ public class SimulationScene : MonoBehaviour
         world.Config = simulationConfig;
 
         NPCSpawner npcSpawner = new NPCSpawner();
-        npcSpawner.Spawn(simulationConfig.npcCount);
-        
+        npcSpawner.Spawn(simulationConfig.npcCount, transform);
+
         Light sun = GetComponentInChildren<Light>();
         DayLight dayLight = new GameObject("DayLight").AddComponent<DayLight>();
         dayLight.BindSun(sun);
+        dayLight.transform.SetParent(transform);
 
-        new GameObject("GameFlow").AddComponent<GameFlow>();
+        new GameObject("GameFlow").AddComponent<GameFlow>();   // 재시작을 담당하므로 씬 루트 밖에 둔다
     }
 }

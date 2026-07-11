@@ -10,11 +10,14 @@ public class GameFlow : MonoBehaviour
     private const float StopTimeout = 5f;
     private const float GatherTimeout = 15f;
     private const float PointDuration = 1.5f;
+    private const float ResultDuration = 5f;
+    private const string ScenePrefabPath = "Prefabs/SimulationScene";
 
     private readonly NightEvent nightEvent = new NightEvent();
     private readonly BanishmentEvent banishmentEvent = new BanishmentEvent();
     private readonly Queue<IEnumerator> pendingEvents = new Queue<IEnumerator>();
     private bool eventRunning;
+    private bool gameEnded;
 
     private void Start()
     {
@@ -31,6 +34,8 @@ public class GameFlow : MonoBehaviour
 
     private void OnPhaseChanged(TimePhase phase)
     {
+        if (gameEnded) return;
+
         if (phase == TimePhase.Dusk) EnqueueEvent(RunBanishment());
         if (phase == TimePhase.Night) EnqueueEvent(RunNightEvent());
     }
@@ -78,6 +83,8 @@ public class GameFlow : MonoBehaviour
 
         victim.Vanish(LifeState.Victim);
         Debug.Log($"[GameFlow] Night {World.Instance.Time.Day} : {victim.OwnColor} disappeared.");
+
+        TryEndGame();
     }
 
     // ---- 해질녘 추방 ----
@@ -123,12 +130,54 @@ public class GameFlow : MonoBehaviour
         accused.Vanish(LifeState.Banished);
         Debug.Log($"[GameFlow] Day {World.Instance.Time.Day} : {accused.OwnColor} was banished. (culprit: {accused.Role == Role.Culprit})");
 
-        // 일상 재개
+        TryEndGame();
+        if (gameEnded) yield break;   // 판이 끝났으면 일상을 재개하지 않는다
+
         foreach (NPC npc in villagers)
         {
             if (npc == accused) continue;
             npc.SetBrainActive(true);
         }
+    }
+
+    // ---- 승패 & 재시작 ----
+
+    private void TryEndGame()
+    {
+        if (gameEnded) return;
+
+        GameResult? result = WinCondition.Evaluate();
+        if (result == null) return;
+
+        gameEnded = true;
+        pendingEvents.Clear();
+
+        StartCoroutine(RunGameEnd(result.Value));
+    }
+
+    private IEnumerator RunGameEnd(GameResult result)
+    {
+        foreach (NPC npc in FindAliveNpcs())
+        {
+            npc.SetBrainActive(false);
+            npc.Movement.RequestStop();
+        }
+
+        string message = (result == GameResult.CitizensWin)
+            ? "시민 승리!\n범인이 마을에서 추방되었습니다."
+            : "범인 승리...\n마을이 조용해졌습니다.";
+
+        ResultUI.Show(message, transform);
+        Debug.Log($"[GameFlow] Game over : {result}");
+
+        yield return new WaitForSeconds(ResultDuration);
+
+        // 새 판 시작: 이 판의 산출물을 모두 지우고 씬 프리팹을 다시 연다
+        Destroy(World.Instance.SceneRoot);
+        yield return null;
+
+        Instantiate(Resources.Load<GameObject>(ScenePrefabPath));
+        Destroy(gameObject);
     }
 
     // 전원 정지. 집 출입 연출(Busy) 중인 NPC는 연출이 끝난 뒤 세운다.
