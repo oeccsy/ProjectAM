@@ -96,7 +96,7 @@ public partial class PicnicAction : Action
         return (picnicElapsed >= picnicDuration) ? Status.Success : Status.Running;
     }
 
-    // 섬 외곽 = 걸을 수 있는 'S' 타일 중 물(이동 불가 타일)과 맞닿은 자리
+    // 섬 외곽 = 일반 지면('A') 타일 중 물과 맞닿은 자리
     private List<Vector2Int> FindIslandEdgeTiles(MapData mapData)
     {
         List<Vector2Int> edgeTiles = new List<Vector2Int>();
@@ -108,7 +108,7 @@ public partial class PicnicAction : Action
         {
             for (int col = 0; col < width; col++)
             {
-                if (mapData.fieldTypes[row, col] != 'S') continue;
+                if (mapData.fieldTypes[row, col] != 'A') continue;
 
                 Vector2Int tile = new Vector2Int(col, row);
 
@@ -130,7 +130,7 @@ public partial class PicnicAction : Action
 
             if (neighbor.x < 0 || neighbor.x >= mapData.resolution.x) return true;
             if (neighbor.y < 0 || neighbor.y >= mapData.resolution.y) return true;
-            if (!Movement.MovableTypes.Contains(mapData.fieldTypes[neighbor.y, neighbor.x])) return true;
+            if (mapData.fieldTypes[neighbor.y, neighbor.x] == ' ') return true;   // 빈 타일 = 물
         }
 
         return false;
