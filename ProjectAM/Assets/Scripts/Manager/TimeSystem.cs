@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 // 24시간제 게임 내 시계. SimulationScene이 생성해 World.Time에 할당한다.
@@ -9,21 +10,15 @@ public class TimeSystem : MonoBehaviour
     private float startHour = 8f;
     [SerializeField]
     private float currentHour;
-    
+    [SerializeField]
+    private int day = 1;
+
+    // 단계가 바뀌는 순간 새 단계를 알린다. (게임 흐름 오케스트레이션 용)
+    public event Action<TimePhase> PhaseChanged;
+
     public float Hour => currentHour;
-    public TimePhase Phase
-    {
-        get
-        {
-            if (currentHour < 5f) return TimePhase.Night;
-            if (currentHour < 7f) return TimePhase.Dawn;
-            if (currentHour < 9f) return TimePhase.Morning;
-            if (currentHour < 16f) return TimePhase.Day;
-            if (currentHour < 18f) return TimePhase.Dusk;
-            if (currentHour < 20f) return TimePhase.Evening;
-            return TimePhase.Night;
-        }
-    }
+    public int Day => day;
+    public TimePhase Phase => EvaluatePhase(currentHour);
 
     private void Awake()
     {
@@ -33,6 +28,24 @@ public class TimeSystem : MonoBehaviour
     private void Update()
     {
         if (dayLengthSeconds <= 0f) return;
+
+        TimePhase previousPhase = Phase;
+        float previousHour = currentHour;
+
         currentHour = Mathf.Repeat(currentHour + Time.deltaTime * (24f / dayLengthSeconds), 24f);
+
+        if (currentHour < previousHour) day++;
+        if (Phase != previousPhase) PhaseChanged?.Invoke(Phase);
+    }
+
+    private TimePhase EvaluatePhase(float hour)
+    {
+        if (hour < 5f) return TimePhase.Night;
+        if (hour < 7f) return TimePhase.Dawn;
+        if (hour < 9f) return TimePhase.Morning;
+        if (hour < 16f) return TimePhase.Day;
+        if (hour < 18f) return TimePhase.Dusk;
+        if (hour < 20f) return TimePhase.Evening;
+        return TimePhase.Night;
     }
 }
