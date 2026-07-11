@@ -15,6 +15,7 @@ public class Interaction : MonoBehaviour
     public bool Busy { get; set; }
 
     public InteractionState State => state;
+    public NPC Partner { get; private set; }
     public bool CanBeEngaged => !Busy && state == InteractionState.None && owner.HouseEntry.CurrentHouse == null;
 
     private void Awake()
@@ -41,6 +42,7 @@ public class Interaction : MonoBehaviour
     public void BeginTalkWith(NPC partner)
     {
         state = InteractionState.Talking;
+        Partner = partner;
         FaceTo(partner.transform.position);
     }
 
@@ -48,6 +50,7 @@ public class Interaction : MonoBehaviour
     public void Release()
     {
         state = InteractionState.None;
+        Partner = null;
 
         if (brainSuspended)
         {

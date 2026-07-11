@@ -1134,6 +1134,8 @@ GameObject:
   - component: {fileID: 8041132663924648177}
   - component: {fileID: 6652000641580039492}
   - component: {fileID: 2244217355094034779}
+  - component: {fileID: 8510501151056663119}
+  - component: {fileID: 7621870738153302324}
   m_Layer: 0
   m_Name: NPC_Girl
   m_TagString: Untagged
@@ -1382,6 +1384,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Interaction
   state: 0
+--- !u!114 &8510501151056663119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6189c3c3ff52e4344ac6e86a3984031d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcMemory
+--- !u!114 &7621870738153302324
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4570e2e7f09261f4ead3ae31cee70c29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ContactObserver
 --- !u!1 &7093843773077066281
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,6 +16,7 @@ public class NPC : MonoBehaviour, IMovable
     private HouseEntry houseEntry;
     private Perception perception;
     private Interaction interaction;
+    private NpcMemory memory;
 
     public NpcColor OwnColor => ownColor;
     public Role Role => role;
@@ -24,6 +25,7 @@ public class NPC : MonoBehaviour, IMovable
     public HouseEntry HouseEntry => houseEntry;
     public Perception Perception => perception;
     public Interaction Interaction => interaction;
+    public NpcMemory Memory => memory;
     public Vector2Int CurrentTile => movement.CurrentTile;
 
     private void Awake()
@@ -34,6 +36,7 @@ public class NPC : MonoBehaviour, IMovable
         houseEntry = GetComponent<HouseEntry>();
         perception = GetComponent<Perception>();
         interaction = GetComponent<Interaction>();
+        memory = GetComponent<NpcMemory>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
         behaviorGraph.SetVariableValue<NPC>("NPC", this);
