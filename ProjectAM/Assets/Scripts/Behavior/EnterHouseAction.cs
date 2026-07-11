@@ -31,6 +31,7 @@ public partial class EnterHouseAction : Action
         if (npc.HouseEntry == null) return Status.Failure;
 
         entered = false;
+        npc.Interaction.Busy = true;   // 출입 연출 중 접촉 금지
         animation.PlayEnterHouse(() => entered = true);
 
         return Status.Running;
@@ -44,5 +45,8 @@ public partial class EnterHouseAction : Action
         return Status.Success;
     }
 
-    protected override void OnEnd() { }
+    protected override void OnEnd()
+    {
+        if (npc != null) npc.Interaction.Busy = false;
+    }
 }

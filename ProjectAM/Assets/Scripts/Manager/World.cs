@@ -17,4 +17,5 @@ public class World : Singleton<World>
 
     // Systems
     public TimeSystem Time { get; set; }
+    public ContactLog Contacts { get; set; }
 }

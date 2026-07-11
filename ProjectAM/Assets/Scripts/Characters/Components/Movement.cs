@@ -20,6 +20,7 @@ public class Movement : MonoBehaviour
     private int pathIndex;
     private Vector2Int curTile;
     private Vector2Int nextTile;
+    private bool stopRequested;
 
 
     public MoveState State => moveState;
@@ -119,6 +120,12 @@ public class Movement : MonoBehaviour
         // 목표지점 재설정
         if (curTile == nextTile)
         {
+            if (stopRequested)
+            {
+                Finish();
+                return;
+            }
+
             pathIndex++;
             if (pathIndex >= path.Count)
             {
@@ -144,9 +151,23 @@ public class Movement : MonoBehaviour
         return true;
     }
 
+    // 시작된 걸음은 원자적이므로, 진행 중인 걸음을 마친 뒤 멈춘다.
+    public void RequestStop()
+    {
+        if (moveState == MoveState.Idle) return;
+        if (moveState == MoveState.Waiting)
+        {
+            Finish();
+            return;
+        }
+
+        stopRequested = true;
+    }
+
     public void Finish()
     {
         moveState = MoveState.Idle;
+        stopRequested = false;
 
 #if UNITY_EDITOR
         if (pathDebug != null) pathDebug.ClearPath();

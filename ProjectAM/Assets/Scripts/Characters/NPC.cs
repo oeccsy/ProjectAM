@@ -15,6 +15,7 @@ public class NPC : MonoBehaviour, IMovable
     private Appearance appearance;
     private HouseEntry houseEntry;
     private Perception perception;
+    private Interaction interaction;
 
     public NpcColor OwnColor => ownColor;
     public Role Role => role;
@@ -22,6 +23,7 @@ public class NPC : MonoBehaviour, IMovable
     public Appearance Appearance => appearance;
     public HouseEntry HouseEntry => houseEntry;
     public Perception Perception => perception;
+    public Interaction Interaction => interaction;
     public Vector2Int CurrentTile => movement.CurrentTile;
 
     private void Awake()
@@ -31,6 +33,7 @@ public class NPC : MonoBehaviour, IMovable
         appearance = GetComponent<Appearance>();
         houseEntry = GetComponent<HouseEntry>();
         perception = GetComponent<Perception>();
+        interaction = GetComponent<Interaction>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
         behaviorGraph.SetVariableValue<NPC>("NPC", this);
@@ -39,6 +42,12 @@ public class NPC : MonoBehaviour, IMovable
     private void Update()
     {
         animator.SetInteger("State", (int)movement.State);
+    }
+
+    // 두뇌(행동 트리)를 잠시 멈추거나 재개한다. 접촉·이벤트 연출 중 사용.
+    public void SetBrainActive(bool active)
+    {
+        behaviorGraph.enabled = active;
     }
 
     public void Init(NpcColor color, Role assignedRole)

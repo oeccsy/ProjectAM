@@ -11,11 +11,12 @@ public partial class ExitHouseAction : Action
     [SerializeReference]
     public BlackboardVariable<NPC> Agent;
 
+    private NPC npc;
     private bool exited;
 
     protected override Status OnStart()
     {
-        NPC npc = Agent?.Value;
+        npc = Agent?.Value;
         if (npc == null) return Status.Failure;
         if (npc.HouseEntry == null) return Status.Failure;
         if (npc.HouseEntry.CurrentHouse == null) return Status.Failure;   // 집에 없으면 나갈 것도 없음
@@ -26,6 +27,7 @@ public partial class ExitHouseAction : Action
         npc.HouseEntry.Exit();
 
         exited = false;
+        npc.Interaction.Busy = true;   // 출입 연출 중 접촉 금지
         animation.PlayExitHouse(() => exited = true);
 
         return Status.Running;
@@ -38,5 +40,8 @@ public partial class ExitHouseAction : Action
         return Status.Success;
     }
 
-    protected override void OnEnd() { }
+    protected override void OnEnd()
+    {
+        if (npc != null) npc.Interaction.Busy = false;
+    }
 }

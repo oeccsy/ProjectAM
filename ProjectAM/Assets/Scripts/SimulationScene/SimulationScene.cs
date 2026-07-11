@@ -51,6 +51,7 @@ public class SimulationScene : MonoBehaviour
         world.Square = mapGenerator.Square;
         world.NPCs = new Registry<NPC>();
         world.Time = new GameObject("TimeSystem").AddComponent<TimeSystem>();
+        world.Contacts = new ContactLog();
 
         foreach (House house in mapGenerator.Houses)
         {
