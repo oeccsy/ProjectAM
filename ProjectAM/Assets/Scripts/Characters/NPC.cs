@@ -8,6 +8,8 @@ public class NPC : MonoBehaviour, IMovable
     private NpcColor ownColor = NpcColor.Count;
     [SerializeField]
     private Role role = Role.Citizen;
+    [SerializeField]
+    private LifeState lifeState = LifeState.Alive;
 
     private Animator animator;
     private BehaviorGraphAgent behaviorGraph;
@@ -20,6 +22,8 @@ public class NPC : MonoBehaviour, IMovable
 
     public NpcColor OwnColor => ownColor;
     public Role Role => role;
+    public LifeState LifeState => lifeState;
+    public bool IsAlive => lifeState == LifeState.Alive;
     public Movement Movement => movement;
     public Appearance Appearance => appearance;
     public HouseEntry HouseEntry => houseEntry;
@@ -51,6 +55,26 @@ public class NPC : MonoBehaviour, IMovable
     public void SetBrainActive(bool active)
     {
         behaviorGraph.enabled = active;
+    }
+
+    // 희생/추방으로 마을에서 완전히 사라진다. 연출이 끝난 뒤 호출한다.
+    public void Vanish(LifeState cause)
+    {
+        lifeState = cause;
+
+        interaction.Release();
+        SetBrainActive(false);
+
+        if (houseEntry.CurrentHouse != null)
+        {
+            houseEntry.CurrentHouse.guests.Remove(ownColor);
+        }
+        else
+        {
+            World.Instance.MapRuntime.Release(this, movement.CurrentTile);
+        }
+
+        gameObject.SetActive(false);
     }
 
     public void Init(NpcColor color, Role assignedRole)

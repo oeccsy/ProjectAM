@@ -20,6 +20,7 @@ public class Perception : MonoBehaviour
     {
         if (target == null) return false;
         if (target == owner) return false;
+        if (!target.IsAlive) return false;
         if (target.HouseEntry.CurrentHouse != null) return false;   // 집 안에 있으면 보이지 않음
 
         Vector3 toTarget = target.transform.position - transform.position;

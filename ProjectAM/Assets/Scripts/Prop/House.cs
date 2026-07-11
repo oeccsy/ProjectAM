@@ -13,6 +13,30 @@ public class House : MonoBehaviour
 
     public List<NpcColor> guests;
 
+    // 방문객이 서는 마당('Y') 타일 하나를 무작위로 고른다.
+    public Vector2Int FindRandomYardTile(MapData mapData)
+    {
+        List<Vector2Int> candidates = new List<Vector2Int>();
+
+        int width = mapData.resolution.x;
+        int height = mapData.resolution.y;
+
+        for (int row = anchor.y; row < anchor.y + size.y; row++)
+        {
+            for (int col = anchor.x; col < anchor.x + size.x; col++)
+            {
+                if (row < 0 || col < 0 || row >= height || col >= width) continue;
+                if (mapData.fieldTypes[row, col] != 'Y') continue;
+
+                candidates.Add(new Vector2Int(col, row));
+            }
+        }
+
+        if (candidates.Count == 0) return entrance;
+
+        return candidates[Random.Range(0, candidates.Count)];
+    }
+
     public void ApplyRoofColor(NpcColor color)
     {
         Material colorMaterial = Resources.Load<Material>($"Materials/{color}");

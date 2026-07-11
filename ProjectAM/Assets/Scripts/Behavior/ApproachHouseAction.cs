@@ -35,7 +35,7 @@ public partial class ApproachHouseAction : Action
         if (house == null) house = World.Instance.Houses.Get(npc.OwnColor);
         if (house == null) return Status.Failure;
 
-        destTile = SelectYardTile(house, mapData);
+        destTile = house.FindRandomYardTile(mapData);
         if (destTile == npc.CurrentTile) return Status.Failure;
 
         movement.StartMoveTo(destTile);
@@ -71,25 +71,4 @@ public partial class ApproachHouseAction : Action
     }
 
     protected override void OnEnd() { }
-
-    private Vector2Int SelectYardTile(House house, MapData mapData)
-    {
-        List<Vector2Int> candidates = new List<Vector2Int>();
-
-        int width = mapData.resolution.x;
-        int height = mapData.resolution.y;
-
-        for (int row = house.anchor.y; row < house.anchor.y + house.size.y; row++)
-        {
-            for (int col = house.anchor.x; col < house.anchor.x + house.size.x; col++)
-            {
-                if (row < 0 || col < 0 || row >= height || col >= width) continue;
-                if (mapData.fieldTypes[row, col] != 'Y') continue;
-
-                candidates.Add(new Vector2Int(col, row));
-            }
-        }
-
-        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
-    }
 }
