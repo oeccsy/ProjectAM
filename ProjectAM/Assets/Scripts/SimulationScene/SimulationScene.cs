@@ -43,6 +43,7 @@ public class SimulationScene : MonoBehaviour
         mapGenerator.GenerateMap(mapData, terrainScaleSettings);
 
         World world = World.Instance;
+        world.SceneRoot = gameObject;
         world.MapData = mapData;
         world.MapRuntime = new MapRuntime(mapData.resolution);
         world.Terrain = mapGenerator.Terrain;
@@ -64,6 +65,7 @@ public class SimulationScene : MonoBehaviour
             Debug.LogWarning("SimulationConfig not found at Resources/Data/SimulationConfig.");
             return;
         }
+        world.Config = simulationConfig;
 
         NPCSpawner npcSpawner = new NPCSpawner();
         npcSpawner.Spawn(simulationConfig.npcCount);

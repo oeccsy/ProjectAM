@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class World : Singleton<World>
 {
+    // Scene
+    public GameObject SceneRoot { get; set; }
+    public SimulationConfig Config { get; set; }
+
     // Map
     public MapData MapData { get; set; }
     public MapRuntime MapRuntime { get; set; }
