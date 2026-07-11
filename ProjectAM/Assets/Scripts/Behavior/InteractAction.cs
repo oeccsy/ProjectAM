@@ -42,7 +42,7 @@ public partial class InteractAction : Action
         target = FindNearestTarget();
         if (target == null) return Status.Failure;
 
-        npc.Interaction.BeginEngage();
+        npc.Interaction.BeginEngage(target);
         target.Interaction.HoldBy(npc);
 
         phase = Phase.Approach;
@@ -53,6 +53,8 @@ public partial class InteractAction : Action
 
     protected override Status OnUpdate()
     {
+        if (!target.IsAlive) return Status.Failure;   // 사건으로 상대가 사라진 경우
+
         if (phase == Phase.Approach) return UpdateApproach();
 
         return UpdateTalk();

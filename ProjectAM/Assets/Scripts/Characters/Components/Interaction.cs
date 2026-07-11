@@ -27,6 +27,7 @@ public class Interaction : MonoBehaviour
     public void HoldBy(NPC engager)
     {
         state = InteractionState.Held;
+        Partner = engager;
         brainSuspended = true;
 
         owner.SetBrainActive(false);
@@ -34,9 +35,10 @@ public class Interaction : MonoBehaviour
     }
 
     // 내가 대상을 발견해 다가가기 시작한다.
-    public void BeginEngage()
+    public void BeginEngage(NPC target)
     {
         state = InteractionState.Engaging;
+        Partner = target;
     }
 
     public void BeginTalkWith(NPC partner)

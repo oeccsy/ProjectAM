@@ -62,7 +62,10 @@ public class NPC : MonoBehaviour, IMovable
     {
         lifeState = cause;
 
+        NPC partner = interaction.Partner;
         interaction.Release();
+        if (partner != null) partner.Interaction.Release();
+
         SetBrainActive(false);
 
         if (houseEntry.CurrentHouse != null)

@@ -71,5 +71,7 @@ public class SimulationScene : MonoBehaviour
         Light sun = GetComponentInChildren<Light>();
         DayLight dayLight = new GameObject("DayLight").AddComponent<DayLight>();
         dayLight.BindSun(sun);
+
+        new GameObject("GameFlow").AddComponent<GameFlow>();
     }
 }
