@@ -1297,6 +1297,7 @@ GameObject:
   - component: {fileID: 3450967119247405455}
   - component: {fileID: -2863460901950167145}
   - component: {fileID: 8041132663924648177}
+  - component: {fileID: 4380660649065100972}
   m_Layer: 0
   m_Name: NPC_Boy
   m_TagString: Untagged
@@ -1336,6 +1337,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   ownColor: 8
+  role: 0
 --- !u!95 &3735871334507586540
 Animator:
   serializedVersion: 7
@@ -1517,6 +1519,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &4380660649065100972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6a3dc99f45fc746b038033ec6bfc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Perception
+  viewRadius: 5
+  viewAngle: 120
 --- !u!1 &6968896582534981428
 GameObject:
   m_ObjectHideFlags: 0
