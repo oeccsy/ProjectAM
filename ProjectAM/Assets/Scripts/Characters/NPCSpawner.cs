@@ -10,14 +10,17 @@ public class NPCSpawner
         List<NpcColor> npcColors = ColorUtils.GetNpcColorList();
         
         int actualSpawnCount = Mathf.Min(amount, spawnable.Count);
+        int culpritIndex = Random.Range(0, actualSpawnCount);
         GameObject container = new GameObject("NPCs");
 
         for (int i = 0; i < actualSpawnCount; i++)
         {
             GameObject instance = Object.Instantiate(prefabs[i], spawnable[i], Quaternion.identity, container.transform);
 
+            Role role = (i == culpritIndex) ? Role.Culprit : Role.Citizen;
+
             NPC npc = instance.GetComponent<NPC>();
-            npc.Init(npcColors[i]);
+            npc.Init(npcColors[i], role);
 
             World.Instance.NPCs.Register(npcColors[i], npc);
         }

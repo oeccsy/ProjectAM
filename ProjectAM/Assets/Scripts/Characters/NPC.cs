@@ -6,6 +6,8 @@ public class NPC : MonoBehaviour, IMovable
 {
     [SerializeField]
     private NpcColor ownColor = NpcColor.Count;
+    [SerializeField]
+    private Role role = Role.Citizen;
 
     private Animator animator;
     private BehaviorGraphAgent behaviorGraph;
@@ -14,6 +16,7 @@ public class NPC : MonoBehaviour, IMovable
     private HouseEntry houseEntry;
 
     public NpcColor OwnColor => ownColor;
+    public Role Role => role;
     public Movement Movement => movement;
     public Appearance Appearance => appearance;
     public HouseEntry HouseEntry => houseEntry;
@@ -35,10 +38,11 @@ public class NPC : MonoBehaviour, IMovable
         animator.SetInteger("State", (int)movement.State);
     }
 
-    public void Init(NpcColor color)
+    public void Init(NpcColor color, Role assignedRole)
     {
         if(ownColor != NpcColor.Count) return;
         ownColor = color;
+        role = assignedRole;
 
         appearance.ApplyColor(ownColor);
     }
