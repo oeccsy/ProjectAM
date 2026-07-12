@@ -22,19 +22,17 @@ public class SuspicionEvaluator
     {
         HashSet<NpcColor> knownVictims = new HashSet<NpcColor>();
 
-        foreach (MemoryRecord record in memory.Records)
+        foreach (VictimClue clue in memory.VictimClues)
         {
-            if (record.type == MemoryType.VictimFound) knownVictims.Add(record.subject);
+            knownVictims.Add(clue.victim);
         }
 
         if (knownVictims.Count == 0) return;
 
-        foreach (MemoryRecord record in memory.Records)
+        foreach (ContactClue clue in memory.ContactClues)
         {
-            if (record.type != MemoryType.ContactSeen) continue;
-
-            AccumulateContact(record.subject, record.partner, knownVictims, suspicion);
-            AccumulateContact(record.partner, record.subject, knownVictims, suspicion);
+            AccumulateContact(clue.npcA, clue.npcB, knownVictims, suspicion);
+            AccumulateContact(clue.npcB, clue.npcA, knownVictims, suspicion);
         }
     }
 

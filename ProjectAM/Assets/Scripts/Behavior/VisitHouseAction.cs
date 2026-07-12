@@ -76,7 +76,7 @@ public partial class VisitHouseAction : Action
         if (owner.LifeState != LifeState.Victim) return;
 
         int day = World.Instance.Time.Day;
-        npc.Memory.Remember(MemoryRecord.VictimFound(day, owner.OwnColor));
+        npc.Memory.Remember(new VictimClue(owner.OwnColor, day));
     }
 
     private House SelectRandomOtherHouse()

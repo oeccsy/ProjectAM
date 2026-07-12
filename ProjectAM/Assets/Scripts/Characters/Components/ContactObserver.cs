@@ -25,6 +25,7 @@ public class ContactObserver : MonoBehaviour
     private void Scan()
     {
         int day = World.Instance.Time.Day;
+        int hour = (int)World.Instance.Time.Hour;
 
         foreach (NPC seen in owner.Perception.FindVisibleNpcs())
         {
@@ -33,7 +34,7 @@ public class ContactObserver : MonoBehaviour
             NPC partner = seen.Interaction.Partner;
             if (partner == null) continue;
 
-            owner.Memory.Remember(MemoryRecord.ContactSeen(day, seen.OwnColor, partner.OwnColor));
+            owner.Memory.Remember(new ContactClue(day, hour, seen.OwnColor, partner.OwnColor));
         }
     }
 }

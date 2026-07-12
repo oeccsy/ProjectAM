@@ -106,26 +106,19 @@ public partial class InteractAction : Action
         if (talkElapsed < talkDuration) return Status.Running;
 
         int day = World.Instance.Time.Day;
+        int hour = (int)World.Instance.Time.Hour;
 
         World.Instance.Contacts.Record(npc.OwnColor, target.OwnColor);
 
-        MemoryRecord contact = MemoryRecord.ContactSeen(day, npc.OwnColor, target.OwnColor);
+        ContactClue contact = new ContactClue(day, hour, npc.OwnColor, target.OwnColor);
         npc.Memory.Remember(contact);
         target.Memory.Remember(contact);
 
-        ExchangeRumor(npc, target);
-        ExchangeRumor(target, npc);
+        // 의심/소문 전파
+        npc.Memory.ShareRandomClueWith(target.Memory);
+        target.Memory.ShareRandomClueWith(npc.Memory);
 
         return Status.Success;
-    }
-
-    // 아는 사실 하나를 상대에게 전한다 (의심/소문 전파)
-    private void ExchangeRumor(NPC from, NPC to)
-    {
-        if (from.Memory.TryPickRandom(out MemoryRecord rumor))
-        {
-            to.Memory.Remember(rumor);
-        }
     }
 
     private void BeginTalk()
