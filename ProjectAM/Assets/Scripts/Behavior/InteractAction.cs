@@ -108,15 +108,15 @@ public partial class InteractAction : Action
         int day = World.Instance.Time.Day;
         int hour = (int)World.Instance.Time.Hour;
 
-        World.Instance.Contacts.Record(npc.OwnColor, target.OwnColor);
-
         ContactClue contact = new ContactClue(day, hour, npc.OwnColor, target.OwnColor);
+
+        World.Instance.Contacts.Record(contact);
         npc.Memory.Remember(contact);
         target.Memory.Remember(contact);
 
         // 의심/소문 전파
-        npc.Memory.ShareRandomClueWith(target.Memory);
-        target.Memory.ShareRandomClueWith(npc.Memory);
+        npc.Memory.ShareRandomClue(target.Memory);
+        target.Memory.ShareRandomClue(npc.Memory);
 
         return Status.Success;
     }

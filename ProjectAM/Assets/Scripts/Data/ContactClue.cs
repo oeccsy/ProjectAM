@@ -1,4 +1,4 @@
-// 단서: 두 NPC가 접촉했다 (직접 접촉 / 목격 / 전해 들음)
+// 단서: 두 NPC가 접촉했다는 정보 (직접 접촉 / 목격 / 전해 듣는 경우)
 public readonly struct ContactClue
 {
     public readonly int day;
@@ -8,7 +8,7 @@ public readonly struct ContactClue
 
     public ContactClue(int day, int hour, NpcColor npcA, NpcColor npcB)
     {
-        // 쌍 순서를 정규화해 같은 접촉이 두 번 기억되지 않게 한다
+        // 쌍 순서를 정규화해 같은 정보가 두 번 기억되지 않게 함
         if (npcA > npcB) (npcA, npcB) = (npcB, npcA);
 
         this.day = day;
@@ -16,4 +16,8 @@ public readonly struct ContactClue
         this.npcA = npcA;
         this.npcB = npcB;
     }
+
+    public bool Involves(NpcColor color) => npcA == color || npcB == color;
+
+    public NpcColor OtherOf(NpcColor color) => (npcA == color) ? npcB : npcA;
 }

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 // 오늘 하루 동안 일어난 NPC 간 접촉 기록. 밤 사건 처리 후 비운다.
 public class ContactLog
 {
-    private readonly List<Contact> todayContacts = new List<Contact>();
+    private readonly List<ContactClue> todayContacts = new List<ContactClue>();
 
-    public IReadOnlyList<Contact> TodayContacts => todayContacts;
+    public IReadOnlyList<ContactClue> TodayContacts => todayContacts;
 
-    public void Record(NpcColor first, NpcColor second)
+    public void Record(ContactClue contact)
     {
-        todayContacts.Add(new Contact(first, second));
+        todayContacts.Add(contact);
     }
 
     // 오늘 target과 접촉한 상대 목록 (중복 제거)
@@ -17,7 +17,7 @@ public class ContactLog
     {
         List<NpcColor> partners = new List<NpcColor>();
 
-        foreach (Contact contact in todayContacts)
+        foreach (ContactClue contact in todayContacts)
         {
             if (!contact.Involves(target)) continue;
 
