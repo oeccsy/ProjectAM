@@ -29,7 +29,7 @@ public class NightEvent
     {
         foreach (NPC npc in World.Instance.NPCs.All)
         {
-            if (npc.Role != Role.Culprit) continue;
+            if (npc.Role != Role.Witch) continue;
             if (!npc.IsAlive) continue;
 
             return npc;

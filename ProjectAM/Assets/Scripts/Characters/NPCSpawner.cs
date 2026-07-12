@@ -18,7 +18,7 @@ public class NPCSpawner
         {
             GameObject instance = Object.Instantiate(prefabs[i], spawnable[i], Quaternion.identity, container.transform);
 
-            Role role = (i == culpritIndex) ? Role.Culprit : Role.Citizen;
+            Role role = (i == culpritIndex) ? Role.Witch : Role.Citizen;
 
             NPC npc = instance.GetComponent<NPC>();
             npc.Init(npcColors[i], role);

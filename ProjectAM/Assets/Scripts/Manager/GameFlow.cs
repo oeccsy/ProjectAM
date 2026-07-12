@@ -128,7 +128,7 @@ public class GameFlow : MonoBehaviour
         while (!vanished) yield return null;
 
         accused.Vanish(LifeState.Banished);
-        Debug.Log($"[GameFlow] Day {World.Instance.Time.Day} : {accused.OwnColor} was banished. (culprit: {accused.Role == Role.Culprit})");
+        Debug.Log($"[GameFlow] Day {World.Instance.Time.Day} : {accused.OwnColor} was banished. (culprit: {accused.Role == Role.Witch})");
 
         TryEndGame();
         if (gameEnded) yield break;   // 판이 끝났으면 일상을 재개하지 않는다
@@ -163,9 +163,7 @@ public class GameFlow : MonoBehaviour
             npc.Movement.RequestStop();
         }
 
-        string message = (result == GameResult.CitizensWin)
-            ? "시민 승리!\n범인이 마을에서 추방되었습니다."
-            : "범인 승리...\n마을이 조용해졌습니다.";
+        string message = (result == GameResult.CitizensWin) ? "시민 승리!\n범인이 마을에서 추방되었습니다." : "범인 승리...\n마을이 조용해졌습니다.";
 
         ResultUI.Show(message, transform);
         Debug.Log($"[GameFlow] Game over : {result}");

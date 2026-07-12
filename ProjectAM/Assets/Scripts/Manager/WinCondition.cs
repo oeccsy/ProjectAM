@@ -10,7 +10,7 @@ public static class WinCondition
         {
             if (!npc.IsAlive) continue;
 
-            if (npc.Role == Role.Culprit) aliveCulprits++;
+            if (npc.Role == Role.Witch) aliveCulprits++;
             else aliveCitizens++;
         }
 
