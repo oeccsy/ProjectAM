@@ -5,7 +5,7 @@ using UnityEngine;
 public class TimeSystem : MonoBehaviour
 {
     [SerializeField]
-    private float dayLengthSeconds = 120f;
+    private float dayLengthSeconds = 300f;
     [SerializeField]
     private float startHour = 8f;
     [SerializeField]
@@ -13,7 +13,6 @@ public class TimeSystem : MonoBehaviour
     [SerializeField]
     private int day = 1;
 
-    // 단계가 바뀌는 순간 새 단계를 알린다. (게임 흐름 오케스트레이션 용)
     public event Action<TimePhase> PhaseChanged;
 
     public float Hour => currentHour;
@@ -40,9 +39,7 @@ public class TimeSystem : MonoBehaviour
 
     private TimePhase EvaluatePhase(float hour)
     {
-        if (hour < 5f) return TimePhase.Night;
-        if (hour < 7f) return TimePhase.Dawn;
-        if (hour < 9f) return TimePhase.Morning;
+        if (hour < 7f) return TimePhase.Night;
         if (hour < 16f) return TimePhase.Day;
         if (hour < 18f) return TimePhase.Dusk;
         if (hour < 20f) return TimePhase.Evening;
