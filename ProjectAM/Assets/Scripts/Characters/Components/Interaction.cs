@@ -7,6 +7,7 @@ public class Interaction : MonoBehaviour
     private const float FaceTurnDuration = 0.3f;
 
     private NPC owner;
+    private NpcAnimation animation;
     [SerializeField]
     private InteractionState state = InteractionState.None;
     private bool brainSuspended;
@@ -21,6 +22,7 @@ public class Interaction : MonoBehaviour
     private void Awake()
     {
         owner = GetComponent<NPC>();
+        animation = GetComponent<NpcAnimation>();
     }
 
     // 상대가 나를 발견했다. 하던 일을 멈추고 제자리에 선다.
@@ -45,7 +47,9 @@ public class Interaction : MonoBehaviour
     {
         state = InteractionState.Talking;
         Partner = partner;
+
         FaceTo(partner.transform.position);
+        animation.SetTalking(true);
     }
 
     // 어떤 상태에서든 접촉을 끝내고 일상으로 복귀한다.
@@ -53,6 +57,7 @@ public class Interaction : MonoBehaviour
     {
         state = InteractionState.None;
         Partner = null;
+        animation.SetTalking(false);
 
         if (brainSuspended)
         {

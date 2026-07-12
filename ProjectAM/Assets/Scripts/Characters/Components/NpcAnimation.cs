@@ -9,6 +9,17 @@ public class NpcAnimation : MonoBehaviour
     [SerializeField]
     private int enterSpins = 3;
 
+    private Animator animator;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+    }
+
+    // NPCAnim.controller의 Sit / Talk 파라미터로 자세 애니메이션을 켜고 끈다
+    public void SetSitting(bool value) => animator.SetBool("Sit", value);
+    public void SetTalking(bool value) => animator.SetBool("Talk", value);
+
     // 회오리 치듯 Y축 회전 + 스케일 축소 후 콜백
     public void PlayEnterHouse(Action onComplete)
     {

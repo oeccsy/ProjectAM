@@ -194,6 +194,7 @@ public class GameFlow : MonoBehaviour
                 npc.SetBrainActive(false);
                 npc.Interaction.Release();
                 npc.Movement.RequestStop();
+                npc.GetComponent<NpcAnimation>().SetSitting(false);   // 소풍 중이었어도 일으켜 세운다
                 stopped.Add(npc);
             }
 
