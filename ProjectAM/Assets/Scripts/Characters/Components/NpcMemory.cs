@@ -6,40 +6,23 @@ using UnityEngine;
 /// </summary>
 public class NpcMemory : MonoBehaviour
 {
-    private readonly List<ContactClue> contactClues = new List<ContactClue>();
-    private readonly List<VictimClue> victimClues = new List<VictimClue>();
+    private readonly List<ContactInfo> contactInfoList = new List<ContactInfo>();
+    private readonly List<VictimInfo> victimInfoList = new List<VictimInfo>();
 
-    public IReadOnlyList<ContactClue> ContactClues => contactClues;
-    public IReadOnlyList<VictimClue> VictimClues => victimClues;
+    public IReadOnlyList<ContactInfo> ContactInfoList => contactInfoList;
+    public IReadOnlyList<VictimInfo> VictimInfoList => victimInfoList;
 
-    public void Remember(ContactClue clue)
+    public void Remember(ContactInfo clue)
     {
-        if (contactClues.Contains(clue)) return;
+        if (contactInfoList.Contains(clue)) return;
 
-        contactClues.Add(clue);
+        contactInfoList.Add(clue);
     }
 
-    public void Remember(VictimClue clue)
+    public void Remember(VictimInfo clue)
     {
-        if (victimClues.Contains(clue)) return;
+        if (victimInfoList.Contains(clue)) return;
 
-        victimClues.Add(clue);
-    }
-
-    public void ShareRandomClue(NpcMemory other)
-    {
-        int totalCount = contactClues.Count + victimClues.Count;
-        if (totalCount == 0) return;
-
-        int index = Random.Range(0, totalCount);
-
-        if (index < contactClues.Count)
-        {
-            other.Remember(contactClues[index]);
-        }
-        else
-        {
-            other.Remember(victimClues[index - contactClues.Count]);
-        }
+        victimInfoList.Add(clue);
     }
 }

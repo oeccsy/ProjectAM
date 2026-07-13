@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 시뮬레이션 하루 흐름을 관리하는 클래스.
-/// 시간 단계는 시계(TimeSystem)가 정하고, 이 클래스는 단계에 맞춰 마을 사건(투표, 밤 사건)을 진행한다.
-/// 사건 조건이 단계가 끝날 때까지 충족되지 않으면 그 사건은 조용히 건너뛴다.
+/// 시뮬레이션 흐름을 관리하는 클래스.
+/// 시간 단계는 TimeSystem가 정하고, 이 클래스는 단계에 맞춰 사건(투표, 희생자 처리)을 진행한다.
 /// </summary>
 public class SimulationFlow : MonoBehaviour
 {
+    private readonly List<ContactInfo> dailyContacts = new List<ContactInfo>();
+
     private WaitUntil waitUntilDusk;
     private WaitUntil waitUntilNight;
     private WaitUntil waitUntilDay;
@@ -24,6 +25,16 @@ public class SimulationFlow : MonoBehaviour
 
         waitUntilAllGatheredOrDuskEnds = new WaitUntil(() => AllCitizensGatheredAtSquare() || World.Instance.Time.Phase != TimePhase.Dusk);
         waitUntilAllReturnedOrNightEnds = new WaitUntil(() => AllCitizensReturnedHome() || World.Instance.Time.Phase != TimePhase.Night);
+    }
+
+    private void OnEnable()
+    {
+        Contact.OnContact += RecordContact;
+    }
+
+    private void OnDisable()
+    {
+        Contact.OnContact -= RecordContact;
     }
 
     public void StartSimulation()
@@ -48,6 +59,8 @@ public class SimulationFlow : MonoBehaviour
             yield return waitUntilAllReturnedOrNightEnds;
 
             // 희생자 발생
+
+            dailyContacts.Clear();
         }
     }
 
@@ -73,5 +86,10 @@ public class SimulationFlow : MonoBehaviour
     private bool AllCitizensReturnedHome()
     {
         return false;
+    }
+
+    private void RecordContact(ContactInfo contact)
+    {
+        dailyContacts.Add(contact);
     }
 }
