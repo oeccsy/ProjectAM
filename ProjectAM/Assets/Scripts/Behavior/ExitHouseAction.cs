@@ -20,7 +20,7 @@ public partial class ExitHouseAction : Action
         if (npc.HouseEntry == null) return Status.Failure;
         if (npc.HouseEntry.CurrentHouse == null) return Status.Failure;   // 집에 없으면 나갈 것도 없음
 
-        NpcAnimation animation = npc.GetComponent<NpcAnimation>();
+        NpcAnimation animation = npc.NpcAnimation;
         if (animation == null) return Status.Failure;
 
         npc.HouseEntry.Exit();

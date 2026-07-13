@@ -26,7 +26,7 @@ public partial class EnterHouseAction : Action
         if (house == null) house = World.Instance.Houses.Get(npc.OwnColor);
         if (house == null) return Status.Failure;
 
-        NpcAnimation animation = npc.GetComponent<NpcAnimation>();
+        NpcAnimation animation = npc.NpcAnimation;
         if (animation == null) return Status.Failure;
         if (npc.HouseEntry == null) return Status.Failure;
 
