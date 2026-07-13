@@ -2,8 +2,7 @@ using UnityEngine;
 using System.Collections;
 
 /// <summary>
-/// 시간 정보 day, hour 흐름을 관리하는 클래스.
-/// 외부에 의해 TimePhase가 전환되기 전에는 시간은 일정 구간 이상 흐르지 않는다.
+/// 시간 정보 day, hour, timePhase 흐름을 관리하는 클래스.
 /// </summary>
 public class TimeSystem : MonoBehaviour
 {
@@ -17,10 +16,6 @@ public class TimeSystem : MonoBehaviour
     private float secondsPerHour = 10f;
 
     private WaitForSeconds hourTick;
-    private WaitUntil waitUntilDay;
-    private WaitUntil waitUntilDusk;
-    private WaitUntil waitUntilEvening;
-    private WaitUntil waitUntilNight;
     private Coroutine timeRoutine;
 
     public int Day => day;
@@ -30,16 +25,7 @@ public class TimeSystem : MonoBehaviour
     private void Awake()
     {
         hourTick = new WaitForSeconds(secondsPerHour);
-        waitUntilDay = new WaitUntil(() => timePhase == TimePhase.Day);
-        waitUntilDusk = new WaitUntil(() => timePhase == TimePhase.Dusk);
-        waitUntilEvening = new WaitUntil(() => timePhase == TimePhase.Evening);
-        waitUntilNight = new WaitUntil(() => timePhase == TimePhase.Night);
         timeRoutine = StartCoroutine(TimeRoutine());
-    }
-
-    public void AdvancePhase()
-    {
-        timePhase = (TimePhase)(((int)timePhase + 1) % 4);
     }
 
     private IEnumerator TimeRoutine()
@@ -47,19 +33,18 @@ public class TimeSystem : MonoBehaviour
         while (true)
         {
             yield return FlowHourUntil(8);
+            timePhase = TimePhase.Day;
 
-            yield return waitUntilDay;
             yield return FlowHourUntil(17);
+            timePhase = TimePhase.Dusk;
 
-            yield return waitUntilDusk;
             yield return FlowHourUntil(19);
+            timePhase = TimePhase.Evening;
 
-            yield return waitUntilEvening;
             yield return FlowHourUntil(21);
-
-            yield return waitUntilNight;
+            timePhase = TimePhase.Night;
+            
             yield return FlowHourUntil(24);
-
             day++;
             hour = 0;
         }
