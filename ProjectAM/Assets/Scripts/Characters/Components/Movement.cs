@@ -1,7 +1,10 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 캐릭터의 타일 기반 이동을 처리하는 클래스.
+/// A* 경로 탐색을 통해 목적지까지의 경로를 계산하고, 타일 점유 상황에 따라 대기/이동 상태를 전환한다.
+/// </summary>
 public class Movement : MonoBehaviour
 {
     public static readonly HashSet<char> MovableTypes = new HashSet<char> { 'A', 'B', 'S', 'Y' };

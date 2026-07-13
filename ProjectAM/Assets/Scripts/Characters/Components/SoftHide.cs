@@ -1,7 +1,9 @@
 using UnityEngine;
 
-// GameObject는 켜둔 채(스크립트 계속 동작) Renderer/Collider/물리만 잠시 끈다.
-// SetActive(false)와 달리 스스로 복귀할 수 있어 외부 개입이 필요 없다.
+/// <summary>
+/// GameObject를 비활성화 하는 대신 숨김 상태로 전환하는 클래스
+/// GameObject를 비활성화 하는 경우 스스로 활성화 할 수 없기 때문에 스스로 활성화 하기 위해 존재
+/// </summary>
 public class SoftHide : MonoBehaviour
 {
     private Renderer[] renderers;

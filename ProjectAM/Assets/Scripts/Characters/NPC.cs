@@ -1,13 +1,13 @@
-using Unity.AppUI.MVVM;
 using Unity.Behavior;
 using UnityEngine;
 
+/// <summary>
+/// NPC 객체를 표현하기 위해 필요한 여러 컴포넌트를 감싸고 있는 클래스
+/// </summary>
 public class NPC : MonoBehaviour, IMovable
 {
     [SerializeField]
     private NpcColor ownColor = NpcColor.Count;
-
-    private Animator animator;
     private BehaviorGraphAgent behaviorGraph;
     private Movement movement;
     private Appearance appearance;
@@ -21,18 +21,12 @@ public class NPC : MonoBehaviour, IMovable
 
     private void Awake()
     {
-        animator = GetComponent<Animator>();
         movement = GetComponent<Movement>();
         appearance = GetComponent<Appearance>();
         houseEntry = GetComponent<HouseEntry>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
         behaviorGraph.SetVariableValue<NPC>("NPC", this);
-    }
-
-    private void Update()
-    {
-        animator.SetInteger("State", (int)movement.State);
     }
 
     public void Init(NpcColor color)

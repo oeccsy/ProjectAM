@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// NPC 객체를 생성하는 역할의 클래스
+/// </summary>
 public class NPCSpawner
 {
     public void Spawn(int amount)

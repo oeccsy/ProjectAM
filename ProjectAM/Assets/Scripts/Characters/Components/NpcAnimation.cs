@@ -2,40 +2,58 @@ using System;
 using DG.Tweening;
 using UnityEngine;
 
+/// <summary>
+/// NPC의 애니메이션을 관리하는 클래스
+/// </summary>
 public class NpcAnimation : MonoBehaviour
 {
-    [SerializeField]
-    private float enterDuration = 1.0f;
-    [SerializeField]
-    private int enterSpins = 3;
+    private Animator animator;
+    private Movement movement;
+
+    private void Awake()
+    {
+        animator = GetComponent<Animator>();
+        movement = GetComponent<Movement>();
+    }
+
+    private void Update()
+    {
+        animator.SetInteger("State", (int)movement.State);
+    }
 
     // 회오리 치듯 Y축 회전 + 스케일 축소 후 콜백
-    public void PlayEnterHouse(Action onComplete)
+    public void SpinWithHideAnim(Action onComplete)
     {
+        float duration = 1.0f;
+        int spins = 3;
+
         Sequence sequence = DOTween.Sequence();
         
         sequence.Join(transform
-            .DORotate(new Vector3(0f, 360f * enterSpins, 0f), enterDuration, RotateMode.FastBeyond360)
+            .DORotate(new Vector3(0f, 360f * spins, 0f), duration, RotateMode.FastBeyond360)
             .SetEase(Ease.InQuad));
         
         sequence.Join(transform
-            .DOScale(Vector3.zero, enterDuration)
+            .DOScale(Vector3.zero, duration)
             .SetEase(Ease.InBack));
 
         sequence.OnComplete(() => onComplete?.Invoke());
     }
 
-    // 회오리 치듯 스케일 복원 후 콜백 (입장의 역재생)
-    public void PlayExitHouse(Action onComplete)
+    // 회오리 치듯 스케일 복원 후 콜백 (Hide의 역재생)
+    public void SpinWithShowAnim(Action onComplete)
     {
+        float duration = 1.0f;
+        int spins = 3;
+
         Sequence sequence = DOTween.Sequence();
 
         sequence.Join(transform
-            .DORotate(new Vector3(0f, 360f * enterSpins, 0f), enterDuration, RotateMode.LocalAxisAdd)
+            .DORotate(new Vector3(0f, 360f * spins, 0f), duration, RotateMode.LocalAxisAdd)
             .SetEase(Ease.OutQuad));
 
         sequence.Join(transform
-            .DOScale(Vector3.one, enterDuration)
+            .DOScale(Vector3.one, duration)
             .SetEase(Ease.OutBack));
 
         sequence.OnComplete(() => onComplete?.Invoke());

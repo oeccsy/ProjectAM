@@ -26,7 +26,7 @@ public partial class ExitHouseAction : Action
         npc.HouseEntry.Exit();
 
         exited = false;
-        animation.PlayExitHouse(() => exited = true);
+        animation.SpinWithShowAnim(() => exited = true);
 
         return Status.Running;
     }

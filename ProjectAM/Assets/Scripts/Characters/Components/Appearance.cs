@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 캐릭터 외형의 색상 변경을 담당하며, 지정된 파츠의 머티리얼을 교체한다.
+/// </summary>
 public class Appearance : MonoBehaviour
 {
     private static readonly HashSet<string> ColorableSlots = new HashSet<string> { "Hat", "Shirt", "Dress" };

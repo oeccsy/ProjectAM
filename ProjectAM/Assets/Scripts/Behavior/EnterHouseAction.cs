@@ -31,7 +31,7 @@ public partial class EnterHouseAction : Action
         if (npc.HouseEntry == null) return Status.Failure;
 
         entered = false;
-        animation.PlayEnterHouse(() => entered = true);
+        animation.SpinWithHideAnim(() => entered = true);
 
         return Status.Running;
     }
