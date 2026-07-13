@@ -1,38 +1,76 @@
 using UnityEngine;
+using System.Collections;
 
-// 24시간제 게임 내 시계. SimulationScene이 생성해 World.Time에 할당한다.
+/// <summary>
+/// 시간 정보 day, hour 흐름을 관리하는 클래스.
+/// 외부에 의해 TimePhase가 전환되기 전에는 시간은 일정 구간 이상 흐르지 않는다.
+/// </summary>
 public class TimeSystem : MonoBehaviour
 {
     [SerializeField]
-    private float dayLengthSeconds = 120f;
+    private int day = 1;
     [SerializeField]
-    private float startHour = 8f;
+    private int hour = 8;
     [SerializeField]
-    private float currentHour;
-    
-    public float Hour => currentHour;
-    public TimePhase Phase
-    {
-        get
-        {
-            if (currentHour < 5f) return TimePhase.Night;
-            if (currentHour < 7f) return TimePhase.Dawn;
-            if (currentHour < 9f) return TimePhase.Morning;
-            if (currentHour < 16f) return TimePhase.Day;
-            if (currentHour < 18f) return TimePhase.Dusk;
-            if (currentHour < 20f) return TimePhase.Evening;
-            return TimePhase.Night;
-        }
-    }
+    private TimePhase timePhase = TimePhase.Day;
+    [SerializeField]
+    private float secondsPerHour = 10f;
+
+    private WaitForSeconds hourTick;
+    private WaitUntil waitUntilDay;
+    private WaitUntil waitUntilDusk;
+    private WaitUntil waitUntilEvening;
+    private WaitUntil waitUntilNight;
+    private Coroutine timeRoutine;
+
+    public int Day => day;
+    public int Hour => hour;
+    public TimePhase Phase => timePhase;
 
     private void Awake()
     {
-        currentHour = Mathf.Repeat(startHour, 24f);
+        hourTick = new WaitForSeconds(secondsPerHour);
+        waitUntilDay = new WaitUntil(() => timePhase == TimePhase.Day);
+        waitUntilDusk = new WaitUntil(() => timePhase == TimePhase.Dusk);
+        waitUntilEvening = new WaitUntil(() => timePhase == TimePhase.Evening);
+        waitUntilNight = new WaitUntil(() => timePhase == TimePhase.Night);
+        timeRoutine = StartCoroutine(TimeRoutine());
     }
 
-    private void Update()
+    public void AdvancePhase()
     {
-        if (dayLengthSeconds <= 0f) return;
-        currentHour = Mathf.Repeat(currentHour + Time.deltaTime * (24f / dayLengthSeconds), 24f);
+        timePhase = (TimePhase)(((int)timePhase + 1) % 4);
+    }
+
+    private IEnumerator TimeRoutine()
+    {
+        while (true)
+        {
+            yield return FlowHourUntil(8);
+
+            yield return waitUntilDay;
+            yield return FlowHourUntil(17);
+
+            yield return waitUntilDusk;
+            yield return FlowHourUntil(19);
+
+            yield return waitUntilEvening;
+            yield return FlowHourUntil(21);
+
+            yield return waitUntilNight;
+            yield return FlowHourUntil(24);
+
+            day++;
+            hour = 0;
+        }
+    }
+
+    private IEnumerator FlowHourUntil(int targetHour)
+    {
+        while (hour < targetHour)
+        {
+            yield return hourTick;
+            hour++;
+        }
     }
 }
