@@ -8,12 +8,15 @@ public class NPC : MonoBehaviour, IMovable
 {
     [SerializeField]
     private NpcColor ownColor = NpcColor.Count;
+    [SerializeField]
+    private Role role = Role.Citizen;
     private BehaviorGraphAgent behaviorGraph;
     private Movement movement;
     private Appearance appearance;
     private HouseEntry houseEntry;
 
     public NpcColor OwnColor => ownColor;
+    public Role Role => role;
     public Movement Movement => movement;
     public Appearance Appearance => appearance;
     public HouseEntry HouseEntry => houseEntry;
@@ -35,5 +38,10 @@ public class NPC : MonoBehaviour, IMovable
         ownColor = color;
 
         appearance.ApplyColor(ownColor);
+    }
+
+    public void ApplyRole(Role role)
+    {
+        this.role = role;
     }
 }

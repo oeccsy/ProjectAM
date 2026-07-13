@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// SimulationScene의 진입점 역할을 하는 클래스
+/// </summary>
 public class SimulationScene : MonoBehaviour
 {
     private void Awake()
@@ -70,5 +73,8 @@ public class SimulationScene : MonoBehaviour
         Light sun = GetComponentInChildren<Light>();
         DayLight dayLight = new GameObject("DayLight").AddComponent<DayLight>();
         dayLight.BindSun(sun);
+
+        SimulationFlow simulationFlow = new GameObject("SimulationFlow").AddComponent<SimulationFlow>();
+        simulationFlow.StartSimulation();
     }
 }
