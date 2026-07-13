@@ -1132,6 +1132,9 @@ GameObject:
   - component: {fileID: 1069954388702151773}
   - component: {fileID: -2863460901950167145}
   - component: {fileID: 8041132663924648177}
+  - component: {fileID: 428065908905610240}
+  - component: {fileID: 8939452092940083706}
+  - component: {fileID: 875987678553033407}
   m_Layer: 0
   m_Name: NPC_Girl
   m_TagString: Untagged
@@ -1276,8 +1279,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f25e62fcac907c4da0a5edb1088f0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcAnimation
-  enterDuration: 1
-  enterSpins: 3
 --- !u!114 &7890931893333393568
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1352,6 +1353,48 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
+--- !u!114 &428065908905610240
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6a3dc99f45fc746b038033ec6bfc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Perception
+  viewRadius: 5
+  viewAngle: 120
+--- !u!114 &8939452092940083706
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b29fab0e3a6c4124f84c75fa2e55fd1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PerceptionDebugRenderer
+  fanColor: {r: 1, g: 0.9, b: 0.2, a: 0.12}
+  edgeColor: {r: 1, g: 0.9, b: 0.2, a: 0.8}
+  visibleColor: {r: 1, g: 0.3, b: 0.3, a: 0.9}
+  heightOffset: 0.05
+--- !u!114 &875987678553033407
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6189c3c3ff52e4344ac6e86a3984031d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcMemory
 --- !u!1 &7093843773077066281
 GameObject:
   m_ObjectHideFlags: 0

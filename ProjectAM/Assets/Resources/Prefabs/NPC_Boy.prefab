@@ -1287,7 +1287,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2049430078241397620}
   - component: {fileID: 2067038324074929043}
-  - component: {fileID: 3735871334507586540}
   - component: {fileID: 9207882348435620675}
   - component: {fileID: 7494498340023430655}
   - component: {fileID: -2619038051374759827}
@@ -1295,6 +1294,10 @@ GameObject:
   - component: {fileID: 423592675224039361}
   - component: {fileID: 2415495268330537380}
   - component: {fileID: 3450967119247405455}
+  - component: {fileID: 7725177349090938153}
+  - component: {fileID: 6561035431030051850}
+  - component: {fileID: 3297031170914363902}
+  - component: {fileID: 3735871334507586540}
   - component: {fileID: -2863460901950167145}
   - component: {fileID: 8041132663924648177}
   m_Layer: 0
@@ -1336,28 +1339,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NPC
   ownColor: 8
---- !u!95 &3735871334507586540
-Animator:
-  serializedVersion: 7
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6551194897314973077}
-  m_Enabled: 1
-  m_Avatar: {fileID: 9000000, guid: 5aa2f1a60a1aa944982728e9189df876, type: 3}
-  m_Controller: {fileID: 9100000, guid: 38f740c239f8cfb49bb7e0e65114b207, type: 2}
-  m_CullingMode: 0
-  m_UpdateMode: 0
-  m_ApplyRootMotion: 0
-  m_LinearVelocityBlending: 0
-  m_StabilizeFeet: 0
-  m_AnimatePhysics: 0
-  m_WarningMessage: 
-  m_HasTransformHierarchy: 1
-  m_AllowConstantClipSamplingOptimization: 1
-  m_KeepAnimatorStateOnDisable: 0
-  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &9207882348435620675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1424,8 +1405,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f25e62fcac907c4da0a5edb1088f0ce, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::NpcAnimation
-  enterDuration: 1
-  enterSpins: 3
 --- !u!114 &423592675224039361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1467,6 +1446,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f353a368f9049f4fad154702ed21c9f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SoftHide
+--- !u!114 &7725177349090938153
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6189c3c3ff52e4344ac6e86a3984031d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NpcMemory
+--- !u!114 &6561035431030051850
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bc6a3dc99f45fc746b038033ec6bfc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Perception
+  viewRadius: 5
+  viewAngle: 120
+--- !u!114 &3297031170914363902
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b29fab0e3a6c4124f84c75fa2e55fd1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PerceptionDebugRenderer
+  fanColor: {r: 1, g: 0.9, b: 0.2, a: 0.12}
+  edgeColor: {r: 1, g: 0.9, b: 0.2, a: 0.8}
+  visibleColor: {r: 1, g: 0.3, b: 0.3, a: 0.9}
+  heightOffset: 0.05
+--- !u!95 &3735871334507586540
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 5aa2f1a60a1aa944982728e9189df876, type: 3}
+  m_Controller: {fileID: 9100000, guid: 38f740c239f8cfb49bb7e0e65114b207, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!136 &-2863460901950167145
 CapsuleCollider:
   m_ObjectHideFlags: 0
