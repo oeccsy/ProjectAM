@@ -58,7 +58,6 @@ public partial class ApproachHouseAction : Action
             waitTime += Time.deltaTime;
             if (waitTime >= MaxWaitTime)
             {
-                movement.Finish();
                 return Status.Failure;
             }
             else

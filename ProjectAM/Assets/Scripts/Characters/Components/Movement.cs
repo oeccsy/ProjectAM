@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 /// <summary>
 /// 캐릭터의 타일 기반 이동을 처리하는 클래스.
@@ -15,45 +17,45 @@ public class Movement : MonoBehaviour
 
     private IMovable owner;
     private Rigidbody rigidbody;
-    [field: SerializeField]
+   [SerializeField]
     private MoveState moveState = MoveState.Idle;
+
+    private Coroutine followPathRoutine;
+    private WaitUntil waitUntilMovable;
+    private WaitUntil waitUntilArrived;
 
     private Astar astar;
     private List<Vector2Int> path;
     private int pathIndex;
+    private Vector2Int prevTile;
     private Vector2Int curTile;
     private Vector2Int nextTile;
 
+    public Vector3 Look { get; set; }
 
     public MoveState State => moveState;
     public Vector2Int CurrentTile => curTile;
-
-#if UNITY_EDITOR
-    private NpcPathDebugRenderer pathDebug;
-#endif
+    public List<Vector2Int> Path => astar.Path;
 
     private void Awake()
     {
         owner = GetComponent<IMovable>();
         rigidbody = GetComponent<Rigidbody>();
 
+        waitUntilMovable = new WaitUntil(() => IsMovable(path[pathIndex]));
+        waitUntilArrived = new WaitUntil(() => curTile == nextTile);
+
+        astar = new Astar(IsMovable, Astar.HeuristicType.Manhattan);
         curTile = TileCoordinate.WorldToTile(transform.position);
 
         bool isEmpty = World.Instance.MapRuntime.IsEmpty(curTile);
         if (isEmpty) World.Instance.MapRuntime.Reserve(owner, curTile);
-
-        MapData mapData = World.Instance.MapData;
-        astar = new Astar(IsMovable, Astar.HeuristicType.Manhattan);
-
-#if UNITY_EDITOR
-        pathDebug = GetComponent<NpcPathDebugRenderer>();
-#endif
     }
 
     private void FixedUpdate()
     {
-        if (moveState == MoveState.Waiting) WaitUntilMovable();
-        if (moveState == MoveState.Moving) FollowPath();
+        Rotate(Look);
+        Move(nextTile);
     }
 
     public void StartMoveTo(Vector2Int destTile)
@@ -66,71 +68,80 @@ public class Movement : MonoBehaviour
 
         path = astar.Path;
         pathIndex = 1;
-        nextTile = path[pathIndex];
 
-#if UNITY_EDITOR
-        if (pathDebug != null) pathDebug.RegisterPath(path);
-#endif
-
-        WaitUntilMovable();
+        followPathRoutine = StartCoroutine(FollowPathRoutine(destTile));
     }
 
-    private void WaitUntilMovable()
+    public void StopMoving()
     {
-        if (IsMovable(nextTile))
-        {
-            moveState = MoveState.Moving;
-            World.Instance.MapRuntime.Reserve(owner, nextTile);
-        }
-        else
-        {
-            moveState = MoveState.Waiting;
-        }
-    }
-
-    private void FollowPath()
-    {
-        Vector3 curPos = transform.position;
-        Vector3 destPos = TileCoordinate.TileToWorld(nextTile);
-        destPos.y = curPos.y;
-
-        Vector3 nextPos = Vector3.MoveTowards(curPos, destPos, MoveSpeed * Time.fixedDeltaTime);
+        if (followPathRoutine == null) return;
         
-        Vector3 dir = destPos - curPos;
-        dir.y = 0f;
+        if (moveState == MoveState.Waiting) StopCoroutine(followPathRoutine);
+        if (moveState == MoveState.Moving) path.Clear(); // 이 다음 경로를 제거하여 현재 이동 마무리 후 중단
+    }
 
-        // 회전
-        if (dir.sqrMagnitude > 0.0001f)
+    private IEnumerator FollowPathRoutine(Vector2Int destTile)
+    {
+        while(curTile != destTile)
         {
-            Quaternion look = Quaternion.LookRotation(dir);
-            rigidbody.rotation = Quaternion.RotateTowards(transform.rotation, look, RotationSpeed * Time.fixedDeltaTime);
-        }
-
-        // 이동
-        if (Vector3.Distance(nextPos, destPos) <= ArriveThreshold)
-        {   
-            rigidbody.MovePosition(destPos);
+            Vector2Int pathTile = path[pathIndex];
             
-            World.Instance.MapRuntime.Release(owner, curTile);
+            if (!IsMovable(pathTile))
+            {
+                moveState = MoveState.Waiting;
+                yield return waitUntilMovable;
+            }
+
+            nextTile = pathTile;
+            World.Instance.MapRuntime.Reserve(owner, nextTile);
+            
+            Vector3 curTilePos = TileCoordinate.TileToWorld(curTile);
+            Vector3 nextTilePos = TileCoordinate.TileToWorld(nextTile);
+            Look = nextTilePos - curTilePos;
+
+            moveState = MoveState.Moving;
+     
+            yield return waitUntilArrived;
+
+            World.Instance.MapRuntime.Release(owner, prevTile);
+            
+            pathIndex++;
+            if(pathIndex >= path.Count)
+            {
+                moveState = MoveState.Idle;
+                yield break;
+            }
+        }
+    }
+
+    private void Rotate(Vector3 dir)
+    {
+        if (dir.sqrMagnitude < 0.0001f) return;
+
+        Quaternion look = Quaternion.LookRotation(dir);
+        rigidbody.rotation = Quaternion.RotateTowards(transform.rotation, look, RotationSpeed * Time.fixedDeltaTime);
+    }
+
+    private void Move(Vector2Int nextTile)
+    {
+        if (moveState != MoveState.Moving) return;
+        if (curTile == nextTile) return;
+
+        Vector3 startPos = transform.position;
+        Vector3 endPos = TileCoordinate.TileToWorld(nextTile);
+        endPos.y = startPos.y;
+        
+        Vector3 stepPos = Vector3.MoveTowards(startPos, endPos, MoveSpeed * Time.fixedDeltaTime);
+
+        if (Vector3.Distance(stepPos, endPos) <= ArriveThreshold)
+        {   
+            rigidbody.MovePosition(endPos);
+            prevTile = curTile;
             curTile = nextTile;
         }
         else
         {
-            rigidbody.MovePosition(nextPos);
-        }
-
-        // 목표지점 재설정
-        if (curTile == nextTile)
-        {
-            pathIndex++;
-            if (pathIndex >= path.Count)
-            {
-                Finish();
-                return;
-            }
-
-            nextTile = path[pathIndex];
-            WaitUntilMovable();
+            rigidbody.MovePosition(stepPos);
         }
     }
 
@@ -146,13 +157,4 @@ public class Movement : MonoBehaviour
 
         return true;
     }
-
-    public void Finish()
-    {
-        moveState = MoveState.Idle;
-
-#if UNITY_EDITOR
-        if (pathDebug != null) pathDebug.ClearPath();
-#endif
-    }    
 }

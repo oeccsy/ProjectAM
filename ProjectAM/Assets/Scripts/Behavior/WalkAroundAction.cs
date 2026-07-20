@@ -14,46 +14,38 @@ public partial class WalkAroundAction : Action
     private const int DestRadius = 8;
     private const float MaxWaitTime = 3.0f;
 
-    private Movement movement;
+    private NPC npc;
     private Vector2Int destTile;
     private readonly List<Vector2Int> candidates = new List<Vector2Int>();
     private float waitTime = 0.0f;
 
     protected override Status OnStart()
     {
-        NPC npc = Agent?.Value;
+        npc = Agent?.Value;
         if (npc == null) return Status.Failure;
 
-        movement = npc.Movement;
-        if (movement == null) return Status.Failure;
-
-        MapData mapData = World.Instance.MapData;
-        if (mapData == null) return Status.Failure;
-
-        destTile = SelectDestination(npc.CurrentTile, mapData);
+        destTile = SelectDestination(npc.CurrentTile);
         if (destTile == npc.CurrentTile) return Status.Failure;
 
-        movement.StartMoveTo(destTile);
-        if (movement.State == MoveState.Idle) return Status.Failure;
-
+        npc.Movement.StartMoveTo(destTile);
         waitTime = 0.0f;
-
+        
         return Status.Running;
     }
 
     protected override Status OnUpdate()
     {
-        if (movement.State == MoveState.Moving)
+        if (npc.Movement.State == MoveState.Moving)
         {
             waitTime = 0.0f;
             return Status.Running;
         }
-        if (movement.State == MoveState.Waiting)
+        if (npc.Movement.State == MoveState.Waiting)
         {
             waitTime += Time.deltaTime;
             if (waitTime >= MaxWaitTime)
             {
-                movement.Finish();
+                npc.Movement.StopMoving();
                 return Status.Failure;
             }
             else
@@ -62,15 +54,16 @@ public partial class WalkAroundAction : Action
             }
         }
 
-        return (movement.CurrentTile == destTile) ? Status.Success : Status.Failure;
+        return (npc.Movement.CurrentTile == destTile) ? Status.Success : Status.Failure;
     }
 
     protected override void OnEnd() { }
 
-    private Vector2Int SelectDestination(Vector2Int origin, MapData mapData)
+    private Vector2Int SelectDestination(Vector2Int origin)
     {
         candidates.Clear();
         
+        MapData mapData = World.Instance.MapData;
         int width = mapData.resolution.x;
         int height = mapData.resolution.y;
 

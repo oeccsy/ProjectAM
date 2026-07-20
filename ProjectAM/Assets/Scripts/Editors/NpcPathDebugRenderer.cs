@@ -1,8 +1,12 @@
+#if UNITY_EDITOR
 using System.Collections.Generic;
 using UnityEngine;
 
-// NPC에 붙여두면, 씬/하이어라키에서 그 NPC를 선택했을 때만
-// 현재 A* 경로를 타일 그리드 + 연결선으로 그려준다 (디버그용).
+/// <summary>
+/// NPC에 붙여두면, 씬/하이어라키에서 그 NPC를 선택했을 때만
+/// 현재 A* 경로를 타일 그리드 + 연결선으로 그려준다 (디버그용).
+/// </summary>
+[RequireComponent(typeof(Movement))]
 public class NpcPathDebugRenderer : MonoBehaviour
 {
     [SerializeField] private Color tileColor = new Color(0f, 1f, 1f, 0.35f);
@@ -11,21 +15,29 @@ public class NpcPathDebugRenderer : MonoBehaviour
     [SerializeField] private float debugTileScale = 0.85f;
     [SerializeField] private float heightOffset = 0.05f;
 
-    private readonly List<Vector2Int> path = new List<Vector2Int>();
-
-    public void RegisterPath(List<Vector2Int> bindTarget)
+    private Movement movement;
+    private Movement Movement
     {
-        if (bindTarget != null) path.AddRange(bindTarget);
-    }
-
-    public void ClearPath()
-    {
-        path.Clear();
+        get
+        {
+            if (movement == null) movement = GetComponent<Movement>();
+            return movement;
+        }
     }
 
     private void OnDrawGizmosSelected()
     {
-        if (path.Count == 0) return;
+        DrawPath();
+    }
+
+    private void DrawPath()
+    {
+        if (Movement == null) return;
+        if (Movement.Path == null) return;
+        if (Movement.Path.Count <= 1) return;
+        if (Movement.State == MoveState.Idle) return;
+
+        List<Vector2Int> path = Movement.Path;
 
         TerrainScaleSettings scale = World.Instance.TerrainScaleSettings;
 
@@ -50,3 +62,5 @@ public class NpcPathDebugRenderer : MonoBehaviour
         }
     }
 }
+
+#endif
