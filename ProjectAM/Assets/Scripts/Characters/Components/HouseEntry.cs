@@ -9,7 +9,7 @@ public class HouseEntry : MonoBehaviour
     private SoftHide softHide;
     private House currentHouse;
     
-    public bool IsInsideHouse => currentHouse == null;
+    public bool IsInsideHouse => currentHouse != null;
     public House CurrentHouse => currentHouse;
 
     private void Awake()
