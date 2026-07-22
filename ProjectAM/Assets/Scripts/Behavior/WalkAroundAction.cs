@@ -57,7 +57,10 @@ public partial class WalkAroundAction : Action
         return (npc.Movement.CurrentTile == destTile) ? Status.Success : Status.Failure;
     }
 
-    protected override void OnEnd() { }
+    protected override void OnEnd()
+    {
+        npc.Movement.StopMoving();
+    }
 
     private Vector2Int SelectDestination(Vector2Int origin)
     {

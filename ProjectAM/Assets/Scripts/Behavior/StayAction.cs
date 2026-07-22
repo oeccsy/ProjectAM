@@ -30,8 +30,6 @@ public partial class StayAction : Action
         return elapsed >= stayDuration ? Status.Success : Status.Running;
     }
 
-    protected override void OnEnd()
-    {
-    }
+    protected override void OnEnd() { }
 }
 

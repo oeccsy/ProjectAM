@@ -9,7 +9,7 @@ using Unity.Properties;
 /// 시간대 분기(Switch) 직전에 두면 그래프가 평가 시점의 최신 시간을 갖게 된다.
 /// </summary>
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "CheckTime", story: "Check current time into [TimePhase] [Day] [Hour]", category: "Action", id: "a7f3c9e1b5d2648a0c1e2f3a4b5c6d7e")]
+[NodeDescription(name: "CheckTime", story: "Check Current Time Into [TimePhase] [Day] [Hour]", category: "Action", id: "a7f3c9e1b5d2648a0c1e2f3a4b5c6d7e")]
 public partial class CheckTimeAction : Action
 {
     [SerializeReference]
