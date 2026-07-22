@@ -29,12 +29,12 @@ public class SimulationFlow : MonoBehaviour
 
     private void OnEnable()
     {
-        Contact.OnContact += RecordContact;
+        Conversation.OnContact += RecordContact;
     }
 
     private void OnDisable()
     {
-        Contact.OnContact -= RecordContact;
+        Conversation.OnContact -= RecordContact;
     }
 
     public void StartSimulation()

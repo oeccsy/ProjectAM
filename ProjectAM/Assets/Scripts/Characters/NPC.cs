@@ -17,6 +17,7 @@ public class NPC : MonoBehaviour, IMovable
     private Perception perception;
     private NpcMemory npcMemory;
     private NpcAnimation npcAnimation;
+    private Conversation conversation;
 
     public NpcColor OwnColor => ownColor;
     public Role Role => role;
@@ -26,6 +27,7 @@ public class NPC : MonoBehaviour, IMovable
     public Perception Perception => perception;
     public NpcMemory NpcMemory => npcMemory;
     public NpcAnimation NpcAnimation => npcAnimation;
+    public Conversation Conversation => conversation;
     public Vector2Int CurrentTile => movement.CurrentTile;
 
     private void Awake()
@@ -36,6 +38,7 @@ public class NPC : MonoBehaviour, IMovable
         perception = GetComponent<Perception>();
         npcMemory = GetComponent<NpcMemory>();
         npcAnimation = GetComponent<NpcAnimation>();
+        conversation = GetComponent<Conversation>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
         behaviorGraph.SetVariableValue<NPC>("NPC", this);
