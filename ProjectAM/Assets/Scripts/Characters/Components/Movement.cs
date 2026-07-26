@@ -76,8 +76,15 @@ public class Movement : MonoBehaviour
     {
         if (followPathRoutine == null) return;
         
-        if (moveState == MoveState.Waiting) StopCoroutine(followPathRoutine);
-        if (moveState == MoveState.Moving) path.Clear(); // 이 다음 경로를 제거하여 현재 이동 마무리 후 중단
+        if (moveState == MoveState.Waiting)
+        {
+            StopCoroutine(followPathRoutine);
+            moveState = MoveState.Idle;
+        }
+        else if (moveState == MoveState.Moving)
+        {
+            path.Clear(); // 이 다음 경로를 제거하여 현재 이동 마무리 후 중단
+        }
     }
 
     private IEnumerator FollowPathRoutine(Vector2Int destTile)
@@ -112,6 +119,8 @@ public class Movement : MonoBehaviour
                 yield break;
             }
         }
+
+        moveState = MoveState.Idle;
     }
 
     private void Rotate(Vector3 dir)
