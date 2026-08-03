@@ -17,4 +17,20 @@ public static class TileCoordinate
         float z = -tile.y * scale.tileSize;
         return new Vector3(x, scale.topHeight, z);
     }
+
+    public static int CalcManhattanDist(Vector2Int src, Vector2Int dest)
+    {
+        int dx = Mathf.Abs(src.x - dest.x);
+        int dy = Mathf.Abs(src.y - dest.y);
+
+        return dx + dy;
+    }
+
+    public static int CalcChebyshevDist(Vector2Int src, Vector2Int dest)
+    {
+        int dx = Mathf.Abs(src.x - dest.x);
+        int dy = Mathf.Abs(src.y - dest.y);
+
+        return Mathf.Max(dx, dy);
+    }
 }

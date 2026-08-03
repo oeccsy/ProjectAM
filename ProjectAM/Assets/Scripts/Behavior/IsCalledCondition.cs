@@ -20,6 +20,6 @@ public partial class IsCalledCondition : Condition
         Conversation conversation = npc.Conversation;
         if (conversation == null) return false;
 
-        return conversation.ConversationState == ConversationState.Callee;
+        return conversation.ConversationRole == ConversationRole.Callee;
     }
 }

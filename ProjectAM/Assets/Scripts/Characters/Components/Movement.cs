@@ -54,8 +54,21 @@ public class Movement : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Rotate(Look);
+        LookAt(Look);
         Move(nextTile);
+    }
+
+    public bool IsMovable(Vector2Int tile)
+    {
+        MapData mapData = World.Instance.MapData;
+
+        if (tile.x < 0 || tile.x >= mapData.resolution.x) return false;
+        if (tile.y < 0 || tile.y >= mapData.resolution.y) return false;
+
+        if (!MovableTypes.Contains(mapData.fieldTypes[tile.y, tile.x])) return false;
+        if (!World.Instance.MapRuntime.IsEmpty(tile)) return false;
+
+        return true;
     }
 
     public void StartMoveTo(Vector2Int destTile)
@@ -102,9 +115,8 @@ public class Movement : MonoBehaviour
             nextTile = pathTile;
             World.Instance.MapRuntime.Reserve(owner, nextTile);
             
-            Vector3 curTilePos = TileCoordinate.TileToWorld(curTile);
             Vector3 nextTilePos = TileCoordinate.TileToWorld(nextTile);
-            Look = nextTilePos - curTilePos;
+            Look = nextTilePos;
 
             moveState = MoveState.Moving;
      
@@ -123,8 +135,11 @@ public class Movement : MonoBehaviour
         moveState = MoveState.Idle;
     }
 
-    private void Rotate(Vector3 dir)
+    private void LookAt(Vector3 pos)
     {
+        Vector3 dir = pos - transform.position;
+        dir.y = 0.0f;
+
         if (dir.sqrMagnitude < 0.0001f) return;
 
         Quaternion look = Quaternion.LookRotation(dir);
@@ -152,18 +167,5 @@ public class Movement : MonoBehaviour
         {
             rigidbody.MovePosition(stepPos);
         }
-    }
-
-    private bool IsMovable(Vector2Int tile)
-    {
-        MapData mapData = World.Instance.MapData;
-
-        if (tile.x < 0 || tile.x >= mapData.resolution.x) return false;
-        if (tile.y < 0 || tile.y >= mapData.resolution.y) return false;
-
-        if (!MovableTypes.Contains(mapData.fieldTypes[tile.y, tile.x])) return false;
-        if (!World.Instance.MapRuntime.IsEmpty(tile)) return false;
-
-        return true;
     }
 }

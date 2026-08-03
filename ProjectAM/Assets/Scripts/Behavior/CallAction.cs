@@ -10,7 +10,7 @@ using Unity.Properties;
 /// 부르기까지만 담당하며, 접근과 대화는 각각 다른 노드가 이어받는다.
 /// </summary>
 [Serializable, GeneratePropertyBag]
-[NodeDescription(name: "Call", story: "[Agent] Call [TargetNPC]", category: "Action", id: "a5406561013947e04ca17131bb88706d")]
+[NodeDescription(name: "Call", story: "[Agent] Call Talkable Npc", category: "Action", id: "a5406561013947e04ca17131bb88706d")]
 public partial class CallAction : Action
 {
     [SerializeReference]

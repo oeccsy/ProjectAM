@@ -7,7 +7,7 @@ using UnityEngine;
 /// NPC가 시야(Perception) 안에서 다른 NPC를 발견했는지 확인
 /// </summary>
 [Serializable, GeneratePropertyBag]
-[Condition(name: "Is Npc Visible", story: "[Agent] Sees Another Npc", category: "Condition", id: "c3e8f1a4b6d05927e1f3a4b5c6d7e8f0")]
+[Condition(name: "Is Talkable Npc Visible", story: "[Agent] Sees Talkable Npc", category: "Condition", id: "c3e8f1a4b6d05927e1f3a4b5c6d7e8f0")]
 public partial class IsNpcVisibleCondition : Condition
 {
     [SerializeReference] public BlackboardVariable<NPC> Agent;
@@ -20,6 +20,11 @@ public partial class IsNpcVisibleCondition : Condition
         Perception perception = npc.Perception;
         if (perception == null) return false;
 
-        return perception.FindVisibleNpcs().Count > 0;
+        foreach(NPC visibleNpc in perception.FindVisibleNpcs())
+        {
+            if (visibleNpc.Conversation.IsTalkable) return true;
+        }
+
+        return false;
     }
 }

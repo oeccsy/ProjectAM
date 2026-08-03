@@ -9,16 +9,19 @@ public class NpcAnimation : MonoBehaviour
 {
     private Animator animator;
     private Movement movement;
+    private Conversation conversation;
 
     private void Awake()
     {
         animator = GetComponent<Animator>();
         movement = GetComponent<Movement>();
+        conversation = GetComponent<Conversation>();
     }
 
     private void Update()
     {
-        animator.SetInteger("State", (int)movement.State);
+        animator.SetInteger("MovementState", (int)movement.State);
+        animator.SetInteger("ConversationState", (int)conversation.ConversationState);
     }
 
     // 회오리 치듯 Y축 회전 + 스케일 축소 후 콜백

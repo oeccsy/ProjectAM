@@ -1,4 +1,6 @@
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -10,9 +12,14 @@ public class Conversation : MonoBehaviour
     private NPC owner;
     private NpcMemory ownMemory;
 
-    public ConversationRole ConversationRole { get; private set; }
+    [field: SerializeField]
+    public ConversationState ConversationState { get; private set; }
+    [field: SerializeField]
+    public ConversationRole ConversationRole { get; private set; } 
+    [field: SerializeField]
     public NPC Partner { get; private set; }
-    public bool IsTalkable => ConversationRole == ConversationRole.None;    
+
+    public bool IsTalkable => ConversationState == ConversationState.Talkable;
 
     public static event Action<ContactInfo> OnContact;
 
@@ -27,6 +34,8 @@ public class Conversation : MonoBehaviour
         if (!caller.Conversation.IsTalkable) return;
         if (!callee.Conversation.IsTalkable) return;
 
+        caller.Conversation.ConversationState = ConversationState.Paired;
+        callee.Conversation.ConversationState = ConversationState.Paired;
         caller.Conversation.ConversationRole = ConversationRole.Caller;
         callee.Conversation.ConversationRole = ConversationRole.Callee;
         caller.Conversation.Partner = callee;
@@ -59,6 +68,21 @@ public class Conversation : MonoBehaviour
         npcB.Conversation.Partner = null;
         npcA.Conversation.ConversationRole = ConversationRole.None;
         npcB.Conversation.ConversationRole = ConversationRole.None;
+        npcA.Conversation.ConversationState = ConversationState.Cooldown;
+        npcB.Conversation.ConversationState = ConversationState.Cooldown;
+
+        npcA.Conversation.StartCoroutine(npcA.Conversation.TalkCooldown());
+        npcB.Conversation.StartCoroutine(npcB.Conversation.TalkCooldown());
+    }
+
+    public void StartCallerRoutine()
+    {
+        StartCoroutine(CallerRoutine());
+    }
+
+    public void StartCalleeRoutine()
+    {
+        StartCoroutine(CalleeRoutine());
     }
 
     // 정보 하나를 무작위로 골라 전달
@@ -80,5 +104,65 @@ public class Conversation : MonoBehaviour
             int actualIndex = index - ownMemory.ContactInfoList.Count;
             otherMemory.Remember(ownMemory.VictimInfoList[actualIndex]);
         }
+    }
+
+    private IEnumerator CallerRoutine()
+    {
+        yield return new WaitUntil(() => (owner.Movement.State == MoveState.Idle) && (Partner.Movement.State == MoveState.Idle));
+
+        int partnerRow = Partner.CurrentTile.y;
+        int partnerCol = Partner.CurrentTile.x;
+        List<Vector2Int> candidates = new List<Vector2Int>();
+
+        for (int row = partnerRow - 1; row <= partnerRow + 1; row++)
+        {
+            for (int col = partnerCol - 1; col <= partnerCol + 1; col++)
+            {
+                Vector2Int dest = new Vector2Int(col, row);
+                if (owner.Movement.IsMovable(dest)) candidates.Add(dest);
+            }
+        }
+        
+        if(candidates.Count <= 0)
+        {
+            Debug.Log("CallerRoutine Fail");
+            yield break;
+        }
+
+        Utils.Shuffle(candidates);
+        owner.Movement.StartMoveTo(candidates[0]);
+
+        yield return new WaitUntil(() => TileCoordinate.CalcChebyshevDist(owner.CurrentTile, Partner.CurrentTile) <= 1 && owner.Movement.State == MoveState.Idle);
+
+        ConversationState = ConversationState.Talking;
+        owner.Movement.Look = Partner.transform.position;
+        Talk(owner, Partner);
+
+        yield return new WaitForSeconds(3f);
+
+        Unpair(owner, Partner);
+    }
+
+    private IEnumerator CalleeRoutine()
+    {
+        yield return new WaitUntil(() => owner.Movement.State == MoveState.Idle);
+        
+        while(true)
+        {
+            owner.Movement.Look = Partner.transform.position;
+            if (Partner.Conversation.ConversationState == ConversationState.Talking) break;
+            yield return null;
+        }
+
+        owner.Movement.Look = Partner.transform.position;
+        ConversationState = ConversationState.Talking;
+
+        yield return new WaitForSeconds(3f);
+    }
+
+    private IEnumerator TalkCooldown()
+    {
+        yield return new WaitForSeconds(3f);
+        ConversationState = ConversationState.Talkable;
     }
 }
