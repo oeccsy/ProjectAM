@@ -11,4 +11,6 @@ public readonly struct VictimInfo
         this.victim = victim;
         this.foundDay = foundDay;
     }
+
+    public override string ToString() => $"희생 D{foundDay} {victim}";
 }

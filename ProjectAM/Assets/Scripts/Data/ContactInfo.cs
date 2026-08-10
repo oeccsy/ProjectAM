@@ -22,4 +22,6 @@ public readonly struct ContactInfo
     public bool Involves(NpcColor color) => npcA == color || npcB == color;
 
     public NpcColor OtherOf(NpcColor color) => (npcA == color) ? npcB : npcA;
+
+    public override string ToString() => $"접촉 D{day} {hour}시 {npcA}-{npcB}";
 }

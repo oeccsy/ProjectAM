@@ -44,11 +44,13 @@ public class Conversation : MonoBehaviour
 
     public static void Talk(NPC npcA, NPC npcB)
     {
-        npcA.Conversation.ShareRandomInfo(npcB);
-        npcB.Conversation.ShareRandomInfo(npcA);
-
         TimeSystem time = World.Instance.Time;
         ContactInfo contact = new ContactInfo(time.Day, time.Hour, npcA.OwnColor, npcB.OwnColor);
+
+        Debug.Log($"[대화] D{time.Day} {time.Hour}시 {npcA.OwnColor} ↔ {npcB.OwnColor}");
+
+        npcA.Conversation.ShareRandomInfo(npcB);
+        npcB.Conversation.ShareRandomInfo(npcA);
 
         NpcMemory memoryA = npcA.NpcMemory;
         NpcMemory memoryB = npcB.NpcMemory;
@@ -97,13 +99,28 @@ public class Conversation : MonoBehaviour
 
         if (index < ownMemory.ContactInfoList.Count)
         {
-            otherMemory.Remember(ownMemory.ContactInfoList[index]);
+            ContactInfo info = ownMemory.ContactInfoList[index];
+            int beforeCount = otherMemory.ContactInfoList.Count;
+
+            otherMemory.Remember(info);
+            LogShare(other, info.ToString(), otherMemory.ContactInfoList.Count != beforeCount);
         }
         else
         {
             int actualIndex = index - ownMemory.ContactInfoList.Count;
-            otherMemory.Remember(ownMemory.VictimInfoList[actualIndex]);
+            VictimInfo info = ownMemory.VictimInfoList[actualIndex];
+            int beforeCount = otherMemory.VictimInfoList.Count;
+
+            otherMemory.Remember(info);
+            LogShare(other, info.ToString(), otherMemory.VictimInfoList.Count != beforeCount);
         }
+    }
+
+    private void LogShare(NPC other, string info, bool isNew)
+    {
+        string result = isNew ? "신규" : "이미 앎";
+
+        Debug.Log($"[교환] {owner.OwnColor} → {other.OwnColor} : {info} ({result})");
     }
 
     private IEnumerator CallerRoutine()
@@ -162,7 +179,7 @@ public class Conversation : MonoBehaviour
 
     private IEnumerator TalkCooldown()
     {
-        yield return new WaitForSeconds(3f);
+        yield return new WaitForSeconds(30f);
         ConversationState = ConversationState.Talkable;
     }
 }
