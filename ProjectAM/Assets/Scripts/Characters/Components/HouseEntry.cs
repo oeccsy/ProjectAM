@@ -37,4 +37,17 @@ public class HouseEntry : MonoBehaviour
         currentHouse.guests.Remove(owner.OwnColor);
         currentHouse = null;
     }
+
+    // 사망으로 자리를 비운다. Exit과 달리 다시 나타나지 않는다
+    public void Vacate()
+    {
+        if (currentHouse == null)
+        {
+            World.Instance.MapRuntime.Release(owner, owner.CurrentTile);
+            return;
+        }
+
+        currentHouse.guests.Remove(owner.OwnColor);
+        currentHouse = null;
+    }
 }

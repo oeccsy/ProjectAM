@@ -18,9 +18,11 @@ public class NPC : MonoBehaviour, IMovable
     private NpcMemory npcMemory;
     private NpcAnimation npcAnimation;
     private Conversation conversation;
+    private Life life;
 
     public NpcColor OwnColor => ownColor;
     public Role Role => role;
+    public Life Life => life;
     public Movement Movement => movement;
     public Appearance Appearance => appearance;
     public HouseEntry HouseEntry => houseEntry;
@@ -39,6 +41,7 @@ public class NPC : MonoBehaviour, IMovable
         npcMemory = GetComponent<NpcMemory>();
         npcAnimation = GetComponent<NpcAnimation>();
         conversation = GetComponent<Conversation>();
+        life = GetComponent<Life>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();
         behaviorGraph.SetVariableValue<NPC>("NPC", this);

@@ -25,6 +25,7 @@ public class Perception : MonoBehaviour
     {
         if (target == null) return false;
         if (target == owner) return false;
+        if (!target.Life.IsAlive) return false;
         if (target.HouseEntry.CurrentHouse != null) return false;
 
         Vector3 toTarget = target.transform.position - transform.position;
