@@ -69,7 +69,10 @@ public partial class ApproachHouseAction : Action
         return (movement.CurrentTile == destTile) ? Status.Success : Status.Failure;
     }
 
-    protected override void OnEnd() { }
+    protected override void OnEnd()
+    {
+        Agent.Value?.Movement.StopMoving();
+    }
 
     private Vector2Int SelectYardTile(House house, MapData mapData)
     {

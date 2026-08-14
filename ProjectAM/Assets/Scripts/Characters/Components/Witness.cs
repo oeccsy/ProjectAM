@@ -35,6 +35,34 @@ public class Witness : MonoBehaviour
         observeRoutine = null;
     }
 
+    // 찾아간 집의 주인이 무사한지 확인한다.
+    public void ObserveHouse(House house)
+    {
+        if (house == null) return;
+        if (ownMemory == null) return;
+        if (World.Instance.NPCs == null) return;
+
+        TimeSystem time = World.Instance.Time;
+        if (time == null) return;
+
+        NPC houseOwner = World.Instance.NPCs.Get(house.owner);
+        if (houseOwner == null) return;
+
+        if (houseOwner.Life.IsAlive)
+        {
+            Debug.Log($"[방문] {owner.OwnColor} : {house.owner}는 잠깐 집을 비운 것 같다");
+            return;
+        }
+
+        VictimInfo victim = new VictimInfo(house.owner, time.Day);
+
+        int beforeCount = ownMemory.VictimInfoList.Count;
+        ownMemory.Remember(victim);
+
+        if (ownMemory.VictimInfoList.Count == beforeCount) return;
+        Debug.Log($"[발견] {owner.OwnColor} : {victim}");
+    }
+
     private IEnumerator ObserveRoutine()
     {
         WaitForSeconds waitForInterval = new WaitForSeconds(observeInterval);
