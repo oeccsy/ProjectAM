@@ -8,16 +8,21 @@ public class NPCSpawner
 {
     public void Spawn(int amount)
     {
-        List<Vector3> spawnable = FindSpawnablePosition(amount);
         List<GameObject> prefabs = SelectRandomNpcPrefab(amount);
         List<NpcColor> npcColors = ColorUtils.GetNpcColorList();
-        
-        int actualSpawnCount = Mathf.Min(amount, spawnable.Count);
+
         GameObject container = new GameObject("NPCs");
 
-        for (int i = 0; i < actualSpawnCount; i++)
+        for (int i = 0; i < amount; i++)
         {
-            GameObject instance = Object.Instantiate(prefabs[i], spawnable[i], Quaternion.identity, container.transform);
+            House house = World.Instance.Houses.Get(npcColors[i]);
+            if (house == null) continue;
+
+            List<Vector2Int> spawnable = FindSpawnableTiles(house);
+            Vector2Int spawnTile = spawnable[Random.Range(0, spawnable.Count)];
+            Vector3 spawnPos = TileCoordinate.TileToWorld(spawnTile);
+
+            GameObject instance = Object.Instantiate(prefabs[i], spawnPos, Quaternion.identity, container.transform);
 
             NPC npc = instance.GetComponent<NPC>();
             npc.Init(npcColors[i]);
@@ -26,33 +31,25 @@ public class NPCSpawner
         }
     }
 
-    private List<Vector3> FindSpawnablePosition(int amount)
+    private List<Vector2Int> FindSpawnableTiles(House house)
     {
         MapData mapData = World.Instance.MapData;
-        TerrainScaleSettings scaleConfig = World.Instance.TerrainScaleSettings;
 
         int height = mapData.resolution.y;
         int width = mapData.resolution.x;
 
-        Vector2Int squareOrigin = World.Instance.Square.origin;
-        List<Vector3> spawnable = new List<Vector3>();
-        
-        for (int row = 0; row < height; row++)
+        List<Vector2Int> spawnable = new List<Vector2Int>();
+
+        foreach (Vector2Int tile in house.GetEntranceTiles())
         {
-            for (int col = 0; col < width; col++)
-            {
-                if (row == squareOrigin.y && col == squareOrigin.x) continue;
-                if (mapData.fieldTypes[row, col] != 'S') continue;
+            if (tile.x < 0 || tile.x >= width) continue;
+            if (tile.y < 0 || tile.y >= height) continue;
 
-                float worldX = col * scaleConfig.tileSize;
-                float worldZ = row * scaleConfig.tileSize;
-                Vector3 worldPos = new Vector3(worldX, scaleConfig.topHeight, -worldZ);
+            if (!Movement.MovableTypes.Contains(mapData.fieldTypes[tile.y, tile.x])) continue;
+            if (!World.Instance.MapRuntime.IsEmpty(tile)) continue;
 
-                spawnable.Add(worldPos);
-            }
+            spawnable.Add(tile);
         }
-        
-        Utils.Shuffle<Vector3>(spawnable);
 
         return spawnable;
     }

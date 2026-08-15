@@ -19,6 +19,7 @@ public class NPC : MonoBehaviour, IMovable
     private NpcAnimation npcAnimation;
     private Conversation conversation;
     private Witness witness;
+    private Suspicion suspicion;
     private Life life;
 
     public NpcColor OwnColor => ownColor;
@@ -32,6 +33,7 @@ public class NPC : MonoBehaviour, IMovable
     public NpcAnimation NpcAnimation => npcAnimation;
     public Conversation Conversation => conversation;
     public Witness Witness => witness;
+    public Suspicion Suspicion => suspicion;
     public Vector2Int CurrentTile => movement.CurrentTile;
 
     private void Awake()
@@ -44,6 +46,7 @@ public class NPC : MonoBehaviour, IMovable
         npcAnimation = GetComponent<NpcAnimation>();
         conversation = GetComponent<Conversation>();
         witness = GetComponent<Witness>();
+        suspicion = GetComponent<Suspicion>();
         life = GetComponent<Life>();
 
         behaviorGraph = GetComponent<BehaviorGraphAgent>();

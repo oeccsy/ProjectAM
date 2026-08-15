@@ -136,6 +136,7 @@ public class MapGenerator
 
         GameObject newObject = Object.Instantiate(prefab, worldPos, Quaternion.identity);
         square = newObject.GetComponent<Square>();
+        square.anchor = mapData.squareAnchor;
         square.origin = squareOrigin;
         square.size = squareInfo.size;
     }
