@@ -4,10 +4,14 @@ using UnityEngine;
 
 /// <summary>
 /// 시뮬레이션 흐름을 관리하는 클래스.
-/// 시간 단계는 TimeSystem가 정하고, 이 클래스는 단계에 맞춰 사건(투표, 희생자 처리)을 진행한다.
+/// 하루를 단계별로 진행시키고, 각 단계에서 벌어지는 사건(희생자 처리)을 다룬다.
+/// TimeSystem은 값을 보관할 뿐이고, 언제 넘길지는 이 클래스가 정한다.
 /// </summary>
 public class SimulationFlow : MonoBehaviour
 {
+    private const float SecondsPerHour = 10f;
+    private const float NightSecondsPerHour = 2f;
+
     [SerializeField]
     private float focusDuration = 10f;
     [SerializeField]
@@ -19,12 +23,6 @@ public class SimulationFlow : MonoBehaviour
 
     private readonly List<ContactInfo> dailyContacts = new List<ContactInfo>();
 
-    private WaitUntil waitUntilDay;
-    private WaitUntil waitUntilDusk;
-    private WaitUntil waitUntilEvening;
-    private WaitUntil waitUntilNight;
-    private WaitUntil waitUntilAllGatheredOrDuskEnds;
-    private WaitUntil waitUntilAllReturnedOrNightEnds;
     private Coroutine flowRoutine;
     private Observer observer;
     private NoticeUI noticeUI;
@@ -33,14 +31,6 @@ public class SimulationFlow : MonoBehaviour
     {
         observer = FindFirstObjectByType<Observer>();
         noticeUI = NoticeUI.Create();
-
-        waitUntilDay = new WaitUntil(() => World.Instance.Time.Phase == TimePhase.Day);
-        waitUntilDusk = new WaitUntil(() => World.Instance.Time.Phase == TimePhase.Dusk);
-        waitUntilEvening = new WaitUntil(() => World.Instance.Time.Phase == TimePhase.Evening);
-        waitUntilNight = new WaitUntil(() => World.Instance.Time.Phase == TimePhase.Night);
-
-        waitUntilAllGatheredOrDuskEnds = new WaitUntil(() => AllCitizensGatheredAtSquare() || World.Instance.Time.Phase != TimePhase.Dusk);
-        waitUntilAllReturnedOrNightEnds = new WaitUntil(() => AllCitizensReturnedHome() || World.Instance.Time.Phase != TimePhase.Night);
     }
 
     private void OnEnable()
@@ -62,49 +52,41 @@ public class SimulationFlow : MonoBehaviour
     {
         DistributeRoles();
 
+        TimeSystem time = World.Instance.Time;
+
         while (true)
         {
-            yield return waitUntilDay;
+            yield return time.FlowHourUntil(8);
 
-            yield return waitUntilDusk;
-            // yield return waitUntilAllGatheredOrDuskEnds;
+            time.ApplyPhase(TimePhase.Day);
+            time.ApplySecondsPerHour(SecondsPerHour);
+            yield return time.FlowHourUntil(17);
 
-            // 투표
+            time.ApplyPhase(TimePhase.Dusk);
+            yield return time.FlowHourUntil(19);
+            yield return new WaitUntil(IsAccusationClosed);
 
-            yield return waitUntilEvening;
-            yield return waitUntilNight;
-            // yield return waitUntilAllReturnedOrNightEnds;
+            time.ApplyPhase(TimePhase.Evening);
+            yield return time.FlowHourUntil(21);
+            yield return new WaitUntil(AllReturnedHome);
 
-            // 희생자 발생
+            time.ApplyPhase(TimePhase.Night);
+            time.ApplySecondsPerHour(NightSecondsPerHour);
             yield return KillVictim();
-
+            
+            yield return time.FlowHourUntil(24);
+            time.NextDay();
             dailyContacts.Clear();
         }
     }
 
-    private void DistributeRoles()
+    private bool IsAccusationClosed()
     {
-        IReadOnlyList<NPC> npcs = World.Instance.NPCs.All;
-        if (npcs.Count == 0) return;
-
-        int vampireIndex = Random.Range(0, npcs.Count);
-
-        for (int i = 0; i < npcs.Count; i++)
-        {
-            Role role = (i == vampireIndex) ? Role.Vampire : Role.Citizen;
-            npcs[i].ApplyRole(role);
-        }
+        return Accusation.Phase == AccusationPhase.None;
     }
 
-    private bool AllCitizensGatheredAtSquare()
+    private bool AllReturnedHome()
     {
-        return true;
-    }
-
-    private bool AllCitizensReturnedHome()
-    {
-        if (World.Instance.NPCs == null) return false;
-
         foreach (NPC npc in World.Instance.NPCs.All)
         {
             if (!npc.Life.IsAlive) continue;
@@ -112,6 +94,20 @@ public class SimulationFlow : MonoBehaviour
         }
 
         return true;
+    }
+
+    private void DistributeRoles()
+    {
+        IReadOnlyList<NPC> npcs = World.Instance.NPCs.All;
+        if (npcs.Count == 0) return;
+
+        int vampireIndex = UnityEngine.Random.Range(0, npcs.Count);
+
+        for (int i = 0; i < npcs.Count; i++)
+        {
+            Role role = (i == vampireIndex) ? Role.Vampire : Role.Citizen;
+            npcs[i].ApplyRole(role);
+        }
     }
 
     // 낮에 범인과 접촉한 사람 중 1명이 사라진다. 접촉이 없었다면 조용한 밤
@@ -129,7 +125,7 @@ public class SimulationFlow : MonoBehaviour
             yield break;
         }
 
-        NPC victim = candidates[Random.Range(0, candidates.Count)];
+        NPC victim = candidates[UnityEngine.Random.Range(0, candidates.Count)];
         victim.Life.Die();
 
         Debug.Log($"[사망] D{day} {victim.OwnColor} (범인 {culprit.OwnColor} 접촉자 {candidates.Count}명 중)");
