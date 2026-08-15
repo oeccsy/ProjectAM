@@ -28,14 +28,11 @@ public partial class ApproachHouseAction : Action
         movement = npc.Movement;
         if (movement == null) return Status.Failure;
 
-        MapData mapData = World.Instance.MapData;
-        if (mapData == null) return Status.Failure;
-
         House house = TargetHouse?.Value;
         if (house == null) house = World.Instance.Houses.Get(npc.OwnColor);
         if (house == null) return Status.Failure;
 
-        destTile = SelectYardTile(house, mapData);
+        destTile = SelectEntranceTile(house, npc.CurrentTile);
         if (destTile == npc.CurrentTile) return Status.Failure;
 
         movement.StartMoveTo(destTile);
@@ -73,25 +70,23 @@ public partial class ApproachHouseAction : Action
     {
         Agent.Value?.Movement.StopMoving();
     }
-
-    private Vector2Int SelectYardTile(House house, MapData mapData)
+    
+    private Vector2Int SelectEntranceTile(House house, Vector2Int from)
     {
-        List<Vector2Int> candidates = new List<Vector2Int>();
+        Vector2Int nearest = from;
+        int nearestDist = int.MaxValue;
 
-        int width = mapData.resolution.x;
-        int height = mapData.resolution.y;
-
-        for (int row = house.anchor.y; row < house.anchor.y + house.size.y; row++)
+        foreach (Vector2Int tile in house.GetApproachTiles())
         {
-            for (int col = house.anchor.x; col < house.anchor.x + house.size.x; col++)
-            {
-                if (row < 0 || col < 0 || row >= height || col >= width) continue;
-                if (mapData.fieldTypes[row, col] != 'Y') continue;
+            if (!movement.IsMovable(tile)) continue;
 
-                candidates.Add(new Vector2Int(col, row));
-            }
+            int dist = TileCoordinate.CalcManhattanDist(from, tile);
+            if (dist >= nearestDist) continue;
+
+            nearest = tile;
+            nearestDist = dist;
         }
 
-        return candidates[UnityEngine.Random.Range(0, candidates.Count)];
+        return nearest;
     }
 }

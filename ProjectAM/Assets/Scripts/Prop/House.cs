@@ -9,24 +9,17 @@ public class House : MonoBehaviour
     public Vector2Int anchor;
     public Vector2Int origin;
     public Vector2Int size;
-    public Vector2Int entrance;
+    public List<Vector2Int> entrances;
 
     public List<NpcColor> guests;
-
-    // 집 범위의 테두리 한 줄이 마당이다. 방문자는 이 중 한 칸에 선다
-    public List<Vector2Int> GetEntranceTiles()
+    
+    public List<Vector2Int> GetApproachTiles()
     {
         List<Vector2Int> tiles = new List<Vector2Int>();
 
-        for (int row = anchor.y; row < anchor.y + size.y; row++)
+        foreach (Vector2Int entrance in entrances)
         {
-            for (int col = anchor.x; col < anchor.x + size.x; col++)
-            {
-                bool isSide = row == anchor.y || row == anchor.y + size.y - 1 || col == anchor.x || col == anchor.x + size.x - 1;
-                if (!isSide) continue;
-
-                tiles.Add(new Vector2Int(col, row));
-            }
+            tiles.Add(anchor + entrance);
         }
 
         return tiles;

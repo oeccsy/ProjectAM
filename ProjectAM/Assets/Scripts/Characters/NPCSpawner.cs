@@ -18,7 +18,7 @@ public class NPCSpawner
             House house = World.Instance.Houses.Get(npcColors[i]);
             if (house == null) continue;
 
-            List<Vector2Int> spawnable = FindSpawnableTiles(house);
+            List<Vector2Int> spawnable = house.GetApproachTiles();
             Vector2Int spawnTile = spawnable[Random.Range(0, spawnable.Count)];
             Vector3 spawnPos = TileCoordinate.TileToWorld(spawnTile);
 
@@ -29,29 +29,6 @@ public class NPCSpawner
 
             World.Instance.NPCs.Register(npcColors[i], npc);
         }
-    }
-
-    private List<Vector2Int> FindSpawnableTiles(House house)
-    {
-        MapData mapData = World.Instance.MapData;
-
-        int height = mapData.resolution.y;
-        int width = mapData.resolution.x;
-
-        List<Vector2Int> spawnable = new List<Vector2Int>();
-
-        foreach (Vector2Int tile in house.GetEntranceTiles())
-        {
-            if (tile.x < 0 || tile.x >= width) continue;
-            if (tile.y < 0 || tile.y >= height) continue;
-
-            if (!Movement.MovableTypes.Contains(mapData.fieldTypes[tile.y, tile.x])) continue;
-            if (!World.Instance.MapRuntime.IsEmpty(tile)) continue;
-
-            spawnable.Add(tile);
-        }
-
-        return spawnable;
     }
 
     private List<GameObject> SelectRandomNpcPrefab(int amount)

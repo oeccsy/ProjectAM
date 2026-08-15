@@ -87,12 +87,14 @@ public class MapGenerator
             float worldZ = houseOrigin.y * terrainSizeData.tileSize;
             Vector3 worldPos = new Vector3(worldX, terrainSizeData.topHeight, -worldZ);
 
-            Quaternion rotation = Quaternion.Euler(0f, 90f * Random.Range(0, 4), 0f);
+            float jitter = Random.Range(-8f, 8f);
+            Quaternion rotation = Quaternion.Euler(0f, jitter, 0f);
             GameObject newObject = Object.Instantiate(prefab, worldPos, rotation, container.transform);
             House newHouse = newObject.GetComponent<House>();
             newHouse.anchor = houseAnchor;
             newHouse.origin = houseOrigin;
             newHouse.size = houseInfo.size;
+            newHouse.entrances = new List<Vector2Int>(houseInfo.entrances);
 
             houses.Add(newHouse);
         }

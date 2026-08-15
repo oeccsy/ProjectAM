@@ -6,11 +6,12 @@ using UnityEngine;
 public class StructureConfig : ScriptableObject
 {
     [Serializable]
-    public struct Entry
+    public class Entry
     {
         public string assetName;
         public Vector2Int size;
         public Vector2Int originOffset;
+        public List<Vector2Int> entrances;
     }
 
     public Entry[] structures;

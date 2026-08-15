@@ -96,7 +96,7 @@ public partial class ApproachOtherHouseAction : Action
         Vector2Int nearest = from;
         int nearestDist = int.MaxValue;
 
-        foreach (Vector2Int tile in house.GetEntranceTiles())
+        foreach (Vector2Int tile in house.GetApproachTiles())
         {
             if (!movement.IsMovable(tile)) continue;
 
