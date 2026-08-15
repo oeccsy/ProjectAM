@@ -30,14 +30,15 @@ public class SimulationScene : MonoBehaviour
             bottomHeight = 0.0f
         };
 
+        World world = World.Instance;
+        world.TerrainScaleSettings = terrainScaleSettings;
+
         MapGenerator mapGenerator = new MapGenerator();
         mapGenerator.GenerateMap(mapData, terrainScaleSettings);
 
-        World world = World.Instance;
         world.MapData = mapData;
         world.MapRuntime = new MapRuntime(mapData.resolution);
         world.Terrain = mapGenerator.Terrain;
-        world.TerrainScaleSettings = terrainScaleSettings;
         world.Houses = new Registry<House>();
         world.Square = mapGenerator.Square;
         world.NPCs = new Registry<NPC>();

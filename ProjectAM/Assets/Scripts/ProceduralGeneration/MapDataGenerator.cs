@@ -387,7 +387,7 @@ public class MapDataGenerator
             return;
         }
 
-        StructureConfig.Entry houseInfo = structureConfig.structures[0];
+        StructureConfig.Entry houseInfo = structureConfig.structures[simulationConfig.houseType];
         Vector2Int houseSize = houseInfo.size;
 
         char[,] tempFieldTypes = new char[height, width];
@@ -510,13 +510,13 @@ public class MapDataGenerator
 
         foreach (Vector2Int anchor in candidates)
         {
-            Vector2Int squareOrigin = anchor + squareInfo.originOffset;
+            Vector2 squareOrigin = TileCoordinate.CalcCenterPos(anchor, squareInfo.size);
 
             float minDist = float.MaxValue;
             foreach (Vector2Int houseAnchor in houseAnchors)
             {
-                Vector2Int houseOrigin = houseAnchor + houseInfo.originOffset;
-                float tempDist = Vector2Int.Distance(squareOrigin, houseOrigin);
+                Vector2 houseOrigin = TileCoordinate.CalcCenterPos(houseAnchor, houseInfo.size);
+                float tempDist = Vector2.Distance(squareOrigin, houseOrigin);
                 if (tempDist < minDist) minDist = tempDist;
             }
 

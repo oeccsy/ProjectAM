@@ -63,29 +63,35 @@ public class MapGenerator
     {
         if (mapData.houseAnchors.Count == 0) return;
 
-        StructureConfig config = Resources.Load<StructureConfig>("Data/StructureConfig");
-        if (config == null)
+        SimulationConfig simulationConfig = Resources.Load<SimulationConfig>("Data/SimulationConfig");
+        if (simulationConfig == null)
+        {
+            Debug.LogWarning("SimulationConfig not found at Resources/Data/SimulationConfig.");
+            return;
+        }
+
+        StructureConfig structureConfig = Resources.Load<StructureConfig>("Data/StructureConfig");
+        if (structureConfig == null)
         {
             Debug.LogWarning("StructureConfig not found at Resources/Data/StructureConfig.");
             return;
         }
 
-        StructureConfig.Entry houseInfo = config.structures[0];
+        StructureConfig.Entry houseInfo = structureConfig.structures[simulationConfig.houseType];
+
+        GameObject prefab = Resources.Load<GameObject>($"Prefabs/House_{simulationConfig.houseType}");
+        if (prefab == null)
+        {
+            Debug.LogWarning($"Structure asset not found: Prefabs/House_{simulationConfig.houseType}");
+            return;
+        }
+
         GameObject container = new GameObject("Houses");
 
         foreach (Vector2Int houseAnchor in mapData.houseAnchors)
         {
-            GameObject prefab = Resources.Load<GameObject>("Prefabs/House");
-            if (prefab == null)
-            {
-                Debug.LogWarning($"Structure asset not found: Prefabs/House");
-                continue;
-            }
-
-            Vector2Int houseOrigin = houseAnchor + houseInfo.originOffset;
-            float worldX = houseOrigin.x * terrainSizeData.tileSize;
-            float worldZ = houseOrigin.y * terrainSizeData.tileSize;
-            Vector3 worldPos = new Vector3(worldX, terrainSizeData.topHeight, -worldZ);
+            Vector2 houseOrigin = TileCoordinate.CalcCenterPos(houseAnchor, houseInfo.size);
+            Vector3 worldPos = TileCoordinate.TileToWorld(houseOrigin);
 
             float jitter = Random.Range(-8f, 8f);
             Quaternion rotation = Quaternion.Euler(0f, jitter, 0f);
@@ -131,10 +137,8 @@ public class MapGenerator
             return;
         }
 
-        Vector2Int squareOrigin = mapData.squareAnchor + squareInfo.originOffset;
-        float worldX = squareOrigin.x * terrainSizeData.tileSize;
-        float worldZ = squareOrigin.y * terrainSizeData.tileSize;
-        Vector3 worldPos = new Vector3(worldX, terrainSizeData.topHeight, -worldZ);
+        Vector2 squareOrigin = TileCoordinate.CalcCenterPos(mapData.squareAnchor, squareInfo.size);
+        Vector3 worldPos = TileCoordinate.TileToWorld(squareOrigin);
 
         GameObject newObject = Object.Instantiate(prefab, worldPos, Quaternion.identity);
         square = newObject.GetComponent<Square>();

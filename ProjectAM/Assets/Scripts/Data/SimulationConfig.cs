@@ -5,4 +5,5 @@ using UnityEngine;
 public class SimulationConfig : ScriptableObject
 {
     public int npcCount;
+    public int houseType;
 }

@@ -7,7 +7,7 @@ public class House : MonoBehaviour
 
     public NpcColor owner;
     public Vector2Int anchor;
-    public Vector2Int origin;
+    public Vector2 origin;
     public Vector2Int size;
     public List<Vector2Int> entrances;
 

@@ -588,7 +588,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Observer
   observerCamera: {fileID: 0}
-  viewOffset: {x: -3, y: 6, z: -6}
+  viewOffset: {x: -13.6, y: 13.4, z: -13.6}
   followDamping: 5
   aimDamping: {x: 5, y: 5}
   screenPosition: {x: 0, y: 0.2}

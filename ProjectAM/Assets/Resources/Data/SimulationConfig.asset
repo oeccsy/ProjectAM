@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: SimulationConfig
   m_EditorClassIdentifier: Assembly-CSharp::SimulationConfig
   npcCount: 6
+  houseType: 0
