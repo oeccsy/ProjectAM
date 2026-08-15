@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94d01c5e7a19b094fb8447dd495631f7, type: 3}
   m_Name: SimulationConfig
   m_EditorClassIdentifier: Assembly-CSharp::SimulationConfig
-  npcCount: 3
+  npcCount: 6

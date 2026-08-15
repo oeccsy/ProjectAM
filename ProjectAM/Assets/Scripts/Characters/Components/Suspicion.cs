@@ -7,6 +7,9 @@ using UnityEngine;
 /// </summary>
 public class Suspicion : MonoBehaviour
 {
+    [SerializeField]
+    private int accuseThreshold = 3;
+
     private NPC owner;
     private NpcMemory ownMemory;
 
@@ -64,6 +67,12 @@ public class Suspicion : MonoBehaviour
         if (tops.Count == 0) return NpcColor.Count;
 
         return tops[Random.Range(0, tops.Count)];
+    }
+
+    // 고발에 나설 만큼 의심이 쌓였는가
+    public bool IsConvinced(NpcColor color)
+    {
+        return CalculateSuspicion(color) >= accuseThreshold;
     }
 
     // 같은 죽음이 발견일별로 여러 번 기억되므로 희생자 기준으로 한 번만 센다

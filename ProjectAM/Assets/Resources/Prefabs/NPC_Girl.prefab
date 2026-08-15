@@ -1138,6 +1138,8 @@ GameObject:
   - component: {fileID: 3735871334507586540}
   - component: {fileID: -2863460901950167145}
   - component: {fileID: 5545337578755618297}
+  - component: {fileID: 2602851296132357740}
+  - component: {fileID: 5249456360199951826}
   m_Layer: 0
   m_Name: NPC_Girl
   m_TagString: Untagged
@@ -1441,6 +1443,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Life
   isAlive: 1
   deathDay: 0
+--- !u!114 &2602851296132357740
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35ab44dcadb970d4784b652c2cf4d9d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Suspicion
+  accuseThreshold: 3
+--- !u!114 &5249456360199951826
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6551194897314973077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a89a74f082dc514bb27dad952732ebd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Accusation
 --- !u!1 &7093843773077066281
 GameObject:
   m_ObjectHideFlags: 0
