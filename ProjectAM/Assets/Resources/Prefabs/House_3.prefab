@@ -605,7 +605,7 @@ MonoBehaviour:
   origin: {x: 0, y: 0}
   size: {x: 0, y: 0}
   entrances: []
-  guests: 
+  guests:
 --- !u!65 &6449144534239370918
 BoxCollider:
   m_ObjectHideFlags: 0

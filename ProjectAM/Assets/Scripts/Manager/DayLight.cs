@@ -11,47 +11,31 @@ public class DayLight : MonoBehaviour
     [SerializeField]
     private float blendSeconds = 5f;
 
-    [Header("Sun Color")]
-    [SerializeField]
-    private Color dayColor = new Color(1.00f, 0.96f, 0.85f);
-    [SerializeField]
-    private Color duskColor = new Color(1.00f, 0.62f, 0.38f);
-    [SerializeField]
-    private Color eveningColor = new Color(0.62f, 0.58f, 0.85f);
-    [SerializeField]
-    private Color nightColor = new Color(0.50f, 0.58f, 0.90f);
-
-    [Header("Sun Intensity")]
-    [SerializeField]
-    private float dayIntensity = 1.10f;
-    [SerializeField]
-    private float duskIntensity = 0.90f;
-    [SerializeField]
-    private float eveningIntensity = 0.70f;
-    [SerializeField]
-    private float nightIntensity = 0.55f;
-
-    [Header("Ambient")]
-    [SerializeField]
-    private Color dayAmbient = new Color(0.60f, 0.62f, 0.66f);
-    [SerializeField]
-    private Color duskAmbient = new Color(0.55f, 0.47f, 0.48f);
-    [SerializeField]
-    private Color eveningAmbient = new Color(0.36f, 0.37f, 0.50f);
-    [SerializeField]
-    private Color nightAmbient = new Color(0.24f, 0.26f, 0.42f);
-
+    private DayLightConfig config;
+    private Camera backgroundCamera;
     private bool hasApplied;
 
     public void BindSun(Light value) => sun = value;
 
     private void Awake()
     {
-        RenderSettings.ambientMode = AmbientMode.Flat;
+        config = Resources.Load<DayLightConfig>("Data/DayLightConfig");
+        if (config == null)
+        {
+            Debug.LogWarning("DayLightConfig not found at Resources/Data/DayLightConfig.");
+            return;
+        }
+
+        // 윗면과 옆면의 앰비언트가 달라야 형태가 드러난다. Flat이면 모든 면이 같은 값을 받는다
+        RenderSettings.ambientMode = AmbientMode.Trilight;
+        RenderSettings.fog = true;
+        RenderSettings.fogMode = FogMode.Linear;
     }
 
     private void Update()
     {
+        if (config == null) return;
+
         TimeSystem time = World.Instance.Time;
         if (time == null) return;
 
@@ -60,9 +44,7 @@ public class DayLight : MonoBehaviour
 
     private void ApplyPhase(TimePhase phase)
     {
-        Color targetSunColor = EvaluateSunColor(phase);
-        float targetIntensity = EvaluateIntensity(phase);
-        Color targetAmbient = EvaluateAmbient(phase);
+        DayLightConfig.PhaseLighting target = EvaluatePhase(phase);
 
         // 첫 프레임은 보간 없이 맞춰 시작 색이 서서히 밝아오는 것을 막는다.
         float blend = hasApplied ? 1f - Mathf.Exp(-Time.deltaTime / blendSeconds) : 1f;
@@ -70,37 +52,36 @@ public class DayLight : MonoBehaviour
 
         if (sun != null)
         {
-            sun.color = Color.Lerp(sun.color, targetSunColor, blend);
-            sun.intensity = Mathf.Lerp(sun.intensity, targetIntensity, blend);
+            sun.color = Color.Lerp(sun.color, target.sunColor, blend);
+            sun.intensity = Mathf.Lerp(sun.intensity, target.sunIntensity, blend);
         }
 
-        RenderSettings.ambientLight = Color.Lerp(RenderSettings.ambientLight, targetAmbient, blend);
+        RenderSettings.ambientSkyColor = Color.Lerp(RenderSettings.ambientSkyColor, target.ambientSky, blend);
+        RenderSettings.ambientEquatorColor = Color.Lerp(RenderSettings.ambientEquatorColor, target.ambientEquator, blend);
+        RenderSettings.ambientGroundColor = Color.Lerp(RenderSettings.ambientGroundColor, target.ambientGround, blend);
+
+        RenderSettings.fogColor = Color.Lerp(RenderSettings.fogColor, target.fogColor, blend);
+        RenderSettings.fogStartDistance = Mathf.Lerp(RenderSettings.fogStartDistance, target.fogStart, blend);
+        RenderSettings.fogEndDistance = Mathf.Lerp(RenderSettings.fogEndDistance, target.fogEnd, blend);
+
+        ApplyBackgroundColor(RenderSettings.fogColor);
     }
 
-    private Color EvaluateSunColor(TimePhase phase)
+    // 배경색이 포그 색과 어긋나면 멀어진 지형이 배경으로 녹아들지 않는다
+    private void ApplyBackgroundColor(Color color)
     {
-        if (phase == TimePhase.Day) return dayColor;
-        if (phase == TimePhase.Dusk) return duskColor;
-        if (phase == TimePhase.Evening) return eveningColor;
+        if (backgroundCamera == null) backgroundCamera = Camera.main;
+        if (backgroundCamera == null) return;
 
-        return nightColor;
+        backgroundCamera.backgroundColor = color;
     }
 
-    private float EvaluateIntensity(TimePhase phase)
+    private DayLightConfig.PhaseLighting EvaluatePhase(TimePhase phase)
     {
-        if (phase == TimePhase.Day) return dayIntensity;
-        if (phase == TimePhase.Dusk) return duskIntensity;
-        if (phase == TimePhase.Evening) return eveningIntensity;
+        if (phase == TimePhase.Day) return config.day;
+        if (phase == TimePhase.Dusk) return config.dusk;
+        if (phase == TimePhase.Evening) return config.evening;
 
-        return nightIntensity;
-    }
-
-    private Color EvaluateAmbient(TimePhase phase)
-    {
-        if (phase == TimePhase.Day) return dayAmbient;
-        if (phase == TimePhase.Dusk) return duskAmbient;
-        if (phase == TimePhase.Evening) return eveningAmbient;
-
-        return nightAmbient;
+        return config.night;
     }
 }

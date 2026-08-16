@@ -98,8 +98,6 @@ public class MapGenerator
             GameObject newObject = Object.Instantiate(prefab, worldPos, rotation, container.transform);
             House newHouse = newObject.GetComponent<House>();
             newHouse.anchor = houseAnchor;
-            newHouse.origin = houseOrigin;
-            newHouse.size = houseInfo.size;
             newHouse.entrances = new List<Vector2Int>(houseInfo.entrances);
 
             houses.Add(newHouse);

@@ -12,7 +12,7 @@ public class House : MonoBehaviour
     public List<Vector2Int> entrances;
 
     public List<NpcColor> guests;
-    
+
     public List<Vector2Int> GetApproachTiles()
     {
         List<Vector2Int> tiles = new List<Vector2Int>();

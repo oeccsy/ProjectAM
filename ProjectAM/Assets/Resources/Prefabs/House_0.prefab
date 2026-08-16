@@ -1054,8 +1054,8 @@ MonoBehaviour:
   anchor: {x: 0, y: 0}
   origin: {x: 0, y: 0}
   size: {x: 0, y: 0}
-  entrance: {x: 0, y: 0}
-  guests: 
+  entrances: []
+  guests:
 --- !u!65 &7616923241490270429
 BoxCollider:
   m_ObjectHideFlags: 0
