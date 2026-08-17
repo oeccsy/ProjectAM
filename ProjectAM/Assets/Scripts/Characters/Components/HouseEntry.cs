@@ -25,12 +25,14 @@ public class HouseEntry : MonoBehaviour
         World.Instance.MapRuntime.Release(owner, owner.CurrentTile);
 
         softHide.Hide();
+        house.TurnOnLight();
     }
 
     public void Exit()
     {
         if (currentHouse == null) return;
 
+        currentHouse.TurnOffLight();
         softHide.Show();
 
         World.Instance.MapRuntime.Reserve(owner, owner.CurrentTile);

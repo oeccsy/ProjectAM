@@ -550,6 +550,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5118407256850152533}
   - component: {fileID: 475496299095091982}
+  - component: {fileID: 7908920452601130519}
   - component: {fileID: 6449144534239370918}
   m_Layer: 0
   m_Name: House_3
@@ -605,7 +606,24 @@ MonoBehaviour:
   origin: {x: 0, y: 0}
   size: {x: 0, y: 0}
   entrances: []
-  guests:
+  guests: 
+  fadeSeconds: 3
+  maxEmissionIntensity: 3
+  maxDecalIntensity: 1.6
+  decalSize: 5
+  decalOffset: 0.4
+--- !u!114 &7908920452601130519
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2582727121683664229}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9afb9ede0f208f1458304da5e2a24f29, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::WindowRenderer
 --- !u!65 &6449144534239370918
 BoxCollider:
   m_ObjectHideFlags: 0

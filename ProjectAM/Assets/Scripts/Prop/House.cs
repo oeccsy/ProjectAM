@@ -13,6 +13,20 @@ public class House : MonoBehaviour
 
     public List<NpcColor> guests;
 
+    [Header("창문 불빛")]
+    private WindowRenderer windowRenderer;
+    private LightDecal lightDecal;
+
+    [SerializeField]
+    private float decalSize = 5f;
+    [SerializeField]
+    private Vector3 decalLocalOffset = new Vector3(-1.5f, 0f, 0f);
+
+    private void Awake()
+    {
+        windowRenderer = GetComponent<WindowRenderer>();
+    }
+
     public List<Vector2Int> GetApproachTiles()
     {
         List<Vector2Int> tiles = new List<Vector2Int>();
@@ -50,5 +64,31 @@ public class House : MonoBehaviour
         }
 
         roofRenderer.sharedMaterial = colorMaterial;
+    }
+
+    public void TurnOnLight()
+    {
+        if (windowRenderer == null) return;
+        if (lightDecal == null)
+        {
+            Vector3 decalCenter = transform.TransformPoint(decalLocalOffset);
+            lightDecal = LightDecal.Create(transform, decalCenter, decalSize);
+        }
+
+        windowRenderer.StartGlow();
+        lightDecal.StartGlow();
+    }
+
+    public void TurnOffLight()
+    {
+        if (windowRenderer == null) return;
+        if (lightDecal == null)
+        {
+            Vector3 decalCenter = transform.TransformPoint(decalLocalOffset);
+            lightDecal = LightDecal.Create(transform, decalCenter, decalSize);
+        }
+
+        windowRenderer.StopGlow();
+        lightDecal.StopGlow();
     }
 }
