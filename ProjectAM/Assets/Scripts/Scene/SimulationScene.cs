@@ -39,9 +39,9 @@ public class SimulationScene : MonoBehaviour
         world.MapData = mapData;
         world.MapRuntime = new MapRuntime(mapData.resolution);
         world.Terrain = mapGenerator.Terrain;
-        world.Houses = new Registry<House>();
+        world.Houses = new Registry<House, NpcColor>();
         world.Square = mapGenerator.Square;
-        world.NPCs = new Registry<NPC>();
+        world.NPCs = new Registry<NPC, NpcColor>();
         world.Time = new GameObject("TimeSystem").AddComponent<TimeSystem>();
 
         foreach (House house in mapGenerator.Houses)

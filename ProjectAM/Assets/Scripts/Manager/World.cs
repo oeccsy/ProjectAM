@@ -9,11 +9,11 @@ public class World : Singleton<World>
     public TerrainScaleSettings TerrainScaleSettings { get; set; }
 
     // Structures
-    public Registry<House> Houses { get; set; }
+    public Registry<House, NpcColor> Houses { get; set; }
     public Square Square { get; set; }
 
     // Npcs
-    public Registry<NPC> NPCs { get; set; }
+    public Registry<NPC, NpcColor> NPCs { get; set; }
 
     // Systems
     public TimeSystem Time { get; set; }

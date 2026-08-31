@@ -1,17 +1,16 @@
 using System.Collections.Generic;
 
-public class Registry<T> where T : class
+public class Registry<T, TKey> where T : class
 {
     private readonly List<T> elems = new();
-    private readonly Dictionary<NpcColor, T> byColor = new();
+    private readonly Dictionary<TKey, T> byKey = new();
 
     public IReadOnlyList<T> All => elems;
+    public T Get(TKey key) => byKey.TryGetValue(key, out T item) ? item : null;
 
-    public T Get(NpcColor color) => byColor.TryGetValue(color, out T item) ? item : null;
-
-    public void Register(NpcColor color, T elem)
+    public void Register(TKey key, T elem)
     {
         elems.Add(elem);
-        byColor[color] = elem;
+        byKey[key] = elem;
     }
 }
