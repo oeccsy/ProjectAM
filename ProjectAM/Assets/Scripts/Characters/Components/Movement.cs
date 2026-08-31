@@ -45,7 +45,7 @@ public class Movement : MonoBehaviour
         waitUntilArrived = new WaitUntil(() => curTile == nextTile);
 
         astar = new Astar(IsMovable, Astar.HeuristicType.Manhattan);
-        curTile = TileCoordinate.WorldToTile(transform.position);
+        curTile = TileCoordinate.WorldToTile(transform.position, World.Instance.TerrainScaleSettings);
 
         bool isEmpty = World.Instance.MapRuntime.IsEmpty(curTile);
         if (isEmpty) World.Instance.MapRuntime.Reserve(owner, curTile);
@@ -114,7 +114,7 @@ public class Movement : MonoBehaviour
             nextTile = pathTile;
             World.Instance.MapRuntime.Reserve(owner, nextTile);
             
-            Vector3 nextTilePos = TileCoordinate.TileToWorld(nextTile);
+            Vector3 nextTilePos = TileCoordinate.TileToWorld(nextTile, World.Instance.TerrainScaleSettings);
             Look = nextTilePos;
 
             moveState = MoveState.Moving;
@@ -151,7 +151,7 @@ public class Movement : MonoBehaviour
         if (curTile == nextTile) return;
 
         Vector3 startPos = transform.position;
-        Vector3 endPos = TileCoordinate.TileToWorld(nextTile);
+        Vector3 endPos = TileCoordinate.TileToWorld(nextTile, World.Instance.TerrainScaleSettings);
         endPos.y = startPos.y;
         
         Vector3 stepPos = Vector3.MoveTowards(startPos, endPos, MoveSpeed * Time.fixedDeltaTime);

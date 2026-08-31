@@ -46,7 +46,7 @@ public class NpcPathDebugRenderer : MonoBehaviour
 
         for (int i = 0; i < path.Count; i++)
         {
-            Vector3 curTilePos = TileCoordinate.TileToWorld(path[i]);
+            Vector3 curTilePos = TileCoordinate.TileToWorld(path[i], scale);
             curTilePos.y += heightOffset;
 
             Gizmos.color = (i == path.Count - 1) ? destColor : tileColor;

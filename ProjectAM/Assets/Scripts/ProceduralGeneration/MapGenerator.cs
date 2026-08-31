@@ -91,7 +91,7 @@ public class MapGenerator
         foreach (Vector2Int houseAnchor in mapData.houseAnchors)
         {
             Vector2 houseOrigin = TileCoordinate.CalcCenterPos(houseAnchor, houseInfo.size);
-            Vector3 worldPos = TileCoordinate.TileToWorld(houseOrigin);
+            Vector3 worldPos = TileCoordinate.TileToWorld(houseOrigin, terrainSizeData);
 
             float jitter = Random.Range(-8f, 8f);
             Quaternion rotation = Quaternion.Euler(0f, jitter, 0f);
@@ -138,7 +138,7 @@ public class MapGenerator
         }
 
         Vector2 squareOrigin = TileCoordinate.CalcCenterPos(mapData.squareAnchor, squareInfo.size);
-        Vector3 worldPos = TileCoordinate.TileToWorld(squareOrigin);
+        Vector3 worldPos = TileCoordinate.TileToWorld(squareOrigin, terrainSizeData);
 
         GameObject newObject = Object.Instantiate(prefab, worldPos, Quaternion.identity);
         square = newObject.GetComponent<Square>();

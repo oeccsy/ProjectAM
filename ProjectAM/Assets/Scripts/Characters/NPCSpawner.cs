@@ -20,7 +20,7 @@ public class NPCSpawner
 
             List<Vector2Int> spawnable = house.GetApproachTiles();
             Vector2Int spawnTile = spawnable[Random.Range(0, spawnable.Count)];
-            Vector3 spawnPos = TileCoordinate.TileToWorld(spawnTile);
+            Vector3 spawnPos = TileCoordinate.TileToWorld(spawnTile, World.Instance.TerrainScaleSettings);
 
             GameObject instance = Object.Instantiate(prefabs[i], spawnPos, Quaternion.identity, container.transform);
 

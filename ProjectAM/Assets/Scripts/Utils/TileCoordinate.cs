@@ -2,20 +2,19 @@ using UnityEngine;
 
 public static class TileCoordinate
 {
-    public static Vector2Int WorldToTile(Vector3 worldPos)
+    public static Vector2Int WorldToTile(Vector3 worldPos, TerrainScaleSettings terrainScaleSettings)
     {
-        float tileSize = World.Instance.TerrainScaleSettings.tileSize;
+        float tileSize = terrainScaleSettings.tileSize;
         int col = Mathf.RoundToInt(worldPos.x / tileSize);
         int row = Mathf.RoundToInt(-worldPos.z / tileSize);
         return new Vector2Int(col, row);
     }
 
-    public static Vector3 TileToWorld(Vector2 tile)
+    public static Vector3 TileToWorld(Vector2 tile, TerrainScaleSettings terrainScaleSettings)
     {
-        TerrainScaleSettings scale = World.Instance.TerrainScaleSettings;
-        float x = tile.x * scale.tileSize;
-        float z = -tile.y * scale.tileSize;
-        return new Vector3(x, scale.topHeight, z);
+        float x = tile.x * terrainScaleSettings.tileSize;
+        float z = -tile.y * terrainScaleSettings.tileSize;
+        return new Vector3(x, terrainScaleSettings.topHeight, z);
     }
 
     public static Vector2 CalcCenterPos(Vector2Int anchor, Vector2Int size)
